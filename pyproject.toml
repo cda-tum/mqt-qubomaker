@@ -52,7 +52,7 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
-coverage = ["mqt.qubomaker[test]", "coverage[toml]~=7.4.0", "pytest-cov~=4.0.0"]
+coverage = ["mqt.qubomaker[test]", "coverage[toml]~=7.4.0", "pytest-cov~=5.0.0"]
 dev = ["mqt.qubomaker[coverage]"]
 docs = [
     "furo>=2023.08.17",
