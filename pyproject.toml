@@ -12,7 +12,7 @@ readme = "README.md"
 authors = [
     { name = "Damian Rovara", email = "damian.rovara@tum.de" },
     { name = "Nils Quetschlich", email = "nils.quetschlich@tum.de" },
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"},
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"},
 ]
 keywords = ["MQT",  "quantum computing", "shortest path"]
 license = { file = "LICENSE" }
