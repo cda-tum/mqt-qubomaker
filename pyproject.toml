@@ -52,12 +52,11 @@ classifiers = [
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
-coverage = ["mqt.qubomaker[test]", "coverage[toml]~=7.4.0", "pytest-cov~=4.0.0"]
-dev = ["mqt.qubomaker[coverage]"]
+coverage = ["mqt.qubomaker[test]", "pytest-cov"]
 docs = [
     "furo>=2023.08.17",
     "sphinx~=7.0",
-    "setuptools-scm>=7",
+    "setuptools-scm>=8",
     "sphinxcontrib-bibtex>=2.4.2",
     "sphinx-copybutton",
     "sphinx-hoverxref",
@@ -69,6 +68,7 @@ docs = [
     "sphinx-autodoc-typehints",
     "qiskit[visualization]",
 ]
+dev = ["mqt.qubomaker[coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqtpathfinder"
