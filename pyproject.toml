@@ -71,10 +71,10 @@ docs = [
 dev = ["mqt.qubomaker[coverage, docs]"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/mqtpathfinder"
-"Bug Tracker" = "https://github.com/cda-tum/mqtpathfinder/issues"
-Discussions = "https://github.com/cda-tum/mqtpathfinder/discussions"
-Research = "https://www.cda.cit.tum.de/research/quantum/"
+Homepage = "https://github.com/cda-tum/mqt-qubomaker"
+Documentation = "https://mqt.readthedocs.io/projects/qubomaker"
+Issues = "https://github.com/cda-tum/mqt-qubomaker/issues"
+Discussions = "https://github.com/cda-tum/mqt-qubomaker/discussions"
 
 [tool.setuptools_scm]
 
