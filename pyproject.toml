@@ -81,6 +81,24 @@ Discussions = "https://github.com/cda-tum/mqt-qubomaker/discussions"
 [tool.setuptools.package-data]
 "mqt.qubomaker.pathfinder" = ["resources/*", "resources/constraints/*"]
 
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
+log_cli_level = "INFO"
+xfail_strict = true
+filterwarnings = [
+    "error"
+]
+
+[tool.coverage]
+run.source = ["mqt.qubomaker"]
+report.exclude_also = [
+    '\.\.\.',
+    'if TYPE_CHECKING:',
+    'raise AssertionError',
+    'raise NotImplementedError',
+]
 
 [tool.mypy]
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
