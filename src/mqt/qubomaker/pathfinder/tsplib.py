@@ -126,17 +126,14 @@ def from_tsplib_problem(
     Returns:
         PathFindingQUBOGenerator: The constructed QUBO generator.
     """
-    match problem.type:
-        case "TSP":
-            return __tsp(problem, encoding_type)
-        case "ATSP":
-            return __tsp(problem, encoding_type)
-        case "HCP":
-            return __hcp(problem, encoding_type)
-        case "SOP":
-            return __sop(problem, encoding_type)
-        case "CVRP":
-            msg = "CVRP is not supported as it is not a pure path-finding problem."
-            raise ValueError(msg)
+    if problem.type == "TSP" or problem.type == "ATSP":
+        return __tsp(problem, encoding_type)
+    if problem.type == "HCP":
+        return __hcp(problem, encoding_type)
+    if problem.type == "SOP":
+        return __sop(problem, encoding_type)
+    if problem.type == "CVRP":
+        msg = "CVRP is not supported as it is not a pure path-finding problem."
+        raise ValueError(msg)
     msg = "Problem type not supported."
     raise ValueError(msg)
