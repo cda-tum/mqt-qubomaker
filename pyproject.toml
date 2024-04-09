@@ -85,7 +85,7 @@ Discussions = "https://github.com/cda-tum/mqt-qubomaker/discussions"
 [tool.mypy]
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
 files = ["src", "tests", "setup.py"]
-python_version = "3.11"
+python_version = "3.8"
 strict = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
