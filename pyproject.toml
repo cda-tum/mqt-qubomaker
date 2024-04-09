@@ -12,9 +12,9 @@ readme = "README.md"
 authors = [
     { name = "Damian Rovara", email = "damian.rovara@tum.de" },
     { name = "Nils Quetschlich", email = "nils.quetschlich@tum.de" },
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"},
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de" },
 ]
-keywords = ["MQT",  "quantum-computing", "qubo", "shortest-path", "design-automation"]
+keywords = ["MQT", "quantum-computing", "qubo", "shortest-path", "design-automation"]
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
 dynamic = ["version"]
@@ -111,7 +111,7 @@ explicit_package_bases = true
 pretty = true
 
 [[tool.mypy.overrides]]
-module = ["types-Pillow", "jsonschema", "tsplib95.*", "ipywidgets.*", "IPython.*", "qiskit.*", "qiskit_algorithms.*",  "matplotlib.*", "python_tsp.*", "networkx.*", "mqt.ddsim.*", "joblib.*", "qiskit_optimization.*", "docplex.*", "typing_extensions.*"]
+module = ["types-Pillow", "jsonschema", "tsplib95.*", "ipywidgets.*", "IPython.*", "qiskit.*", "qiskit_algorithms.*", "matplotlib.*", "python_tsp.*", "networkx.*", "mqt.ddsim.*", "joblib.*", "qiskit_optimization.*", "docplex.*", "typing_extensions.*"]
 ignore_missing_imports = true
 
 [tool.ruff]

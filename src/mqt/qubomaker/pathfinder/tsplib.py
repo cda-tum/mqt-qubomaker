@@ -1,4 +1,5 @@
 """Provides support for the TSPLib format as input for the pathfinding QUBOMaker."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -126,7 +127,7 @@ def from_tsplib_problem(
     Returns:
         PathFindingQUBOGenerator: The constructed QUBO generator.
     """
-    if problem.type == "TSP" or problem.type == "ATSP":
+    if problem.type in {"TSP", "ATSP"}:
         return __tsp(problem, encoding_type)
     if problem.type == "HCP":
         return __hcp(problem, encoding_type)
