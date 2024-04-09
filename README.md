@@ -84,50 +84,6 @@ print(generator.construct_qubo_matrix())
 
 **Detailed documentation and examples are available at [ReadTheDocs](https://mqt-qubomaker.readthedocs.io/en/latest/).**
 
-# Repository Structure
-
-```
-.
-├── docs/
-├── notebooks/
-│ ├── input/
-│ ├── tsp.ipynb
-│ └── tsplib.ipynb
-├── src/
-│ └── mqt/
-│   └── qubomaker/
-│     ├── pathfinder/
-│       ├── resources/
-│         ├── constraints/
-│         ├── constraint.json
-│         └── input-format.json
-│       ├── __init__.py
-│       ├── cost_functions.py
-│       ├── pathfinder.py
-│       └── tsplib.py
-│     ├── __init__.py
-│     ├── graph.py
-│     ├── py.typed
-│     ├── qubo_generator.py
-│     └── utils.py
-├── tests/
-│ ├── pathfinder/
-│   └── resources/
-│     ├── json/
-│     ├── tsplib/
-│     ├── __init__.py
-│     ├── test_cost_functions.py
-│     ├── test_json_input.py
-│     ├── test_pathfinder.py
-│     ├── test_tsplib_input.py
-│     └── utils_test.py
-│ ├── resources/
-│   └── graph/
-│     └── graph.py
-│ ├── __init__.py
-│ └── test_grah.py
-```
-
 ## References
 
 MQT QUBOMaker has been developed based on methods proposed in the following paper:
