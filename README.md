@@ -14,8 +14,9 @@
 # MQT QUBOMaker: Automatic Generation of QUBO Formulations from Optimization Problem Specifications
 
 MQT QUBOMaker is a framework that can be used to automatically generate QUBO formulations for various optimization problems based on a selection of constraints that define the problem.
+It is developed by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/) as part of the _[Munich Quantum Toolkit](https://mqt.readthedocs.io/) (MQT)_.
 
-This allows users to create QUBO formulations, and, thus, interact with quantum algorithms, without requiring any background knowledge in the field of quantum computing. End-users can stay entirely within their domain of expertise while being shielded from the complex and error-prone mathematical tasks of QUBO reformulation.
+The tool allows users to create QUBO formulations, and, thus, interact with quantum algorithms, without requiring any background knowledge in the field of quantum computing. End-users can stay entirely within their domain of expertise while being shielded from the complex and error-prone mathematical tasks of QUBO reformulation.
 
 Furthermore, MQT QUBOMaker supports a variety of different encodings. End users can easily switch between the encodings for evaluation purposes without any additional effort, a task that would otherwise require a large amount of tedious mathematical reformulation.
 
@@ -34,8 +35,6 @@ For more details, please refer to:
 </p>
 
 If you have any questions, feel free to create a [discussion](https://github.com/cda-tum/mqt-qubomaker/discussions) or an [issue](https://github.com/cda-tum/mqt-qubomaker/issues) on [GitHub](https://github.com/cda-tum/mqt-qubomaker).
-
-MQT QUBOMaker is part of the [Munich Quantum Toolkit](https://mqt.readthedocs.io/) (MQT) developed by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
 
 ## Getting Started
 
