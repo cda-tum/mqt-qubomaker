@@ -14,7 +14,7 @@ authors = [
     { name = "Nils Quetschlich", email = "nils.quetschlich@tum.de" },
     { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"},
 ]
-keywords = ["MQT",  "quantum computing", "shortest path"]
+keywords = ["MQT",  "quantum-computing", "qubo", "shortest-path", "design-automation"]
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
 dynamic = ["version"]
