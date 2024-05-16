@@ -29,6 +29,9 @@ jobs:
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
     uses: cda-tum/mqt-core/.github/workflows/reusable-code-ql-python.yml@v2.4.2
+    permissions:
+      contents: read
+      security-events: write
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
