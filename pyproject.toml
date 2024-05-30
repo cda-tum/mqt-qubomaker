@@ -91,7 +91,8 @@ addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
 xfail_strict = true
 filterwarnings = [
-    "error"
+    "error::Warning",
+    "ignore::SyntaxWarning:.*docplex.*"
 ]
 
 [tool.coverage]
