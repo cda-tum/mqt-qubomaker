@@ -21,7 +21,8 @@ dynamic = ["version"]
 
 dependencies = [
     "importlib_resources>=5.0; python_version < '3.10'",
-    "qiskit>=1.0.0",
+    "qiskit>=1.0.0; python_version >= '3.9'",
+    "qiskit==1.0.0; python_version < '3.9'",
     "joblib>=1.3.2",
     "numpy>=1.26.4; python_version > '3.11'",
     "numpy>=1.17.0; python_version <= '3.11'",
@@ -91,8 +92,8 @@ addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
 xfail_strict = true
 filterwarnings = [
-    "error::Warning",
-    "ignore::SyntaxWarning:.*docplex.*"
+    "error",
+    "ignore:.*invalid escape sequence.*::.*docplex.*",
 ]
 
 [tool.coverage]
