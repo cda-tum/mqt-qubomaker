@@ -23,8 +23,6 @@ jobs:
     permissions:
       id-token: write
     uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.0.1
-    secrets:
-      token: ${{ secrets.CODECOV_TOKEN }}
 
   code-ql:
     name: 📝 CodeQL
