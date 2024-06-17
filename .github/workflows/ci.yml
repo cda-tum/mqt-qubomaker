@@ -20,8 +20,6 @@ jobs:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    permissions:
-      id-token: write
     uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.0.1
 
   code-ql:
@@ -29,10 +27,6 @@ jobs:
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
     uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql-python.yml@v1.0.1
-
-    permissions:
-      contents: read
-      security-events: write
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
