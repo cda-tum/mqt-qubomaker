@@ -19,7 +19,7 @@ nox.options.sessions = ["lint", "tests"]
 PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 BUILD_REQUIREMENTS = [
-    "setuptools_scm>=8",
+    "setuptools_scm>=8.1",
     "setuptools>=66.1",
     "wheel>=0.40.0",
 ]
