@@ -19,9 +19,9 @@ nox.options.sessions = ["lint", "tests"]
 PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 BUILD_REQUIREMENTS = [
-    "setuptools_scm>=7",
-    "wheel>=0.43.0",
-    "pybind11>=2.12",
+    "setuptools_scm>=8",
+    "setuptools>=66.1",
+    "wheel>=0.40.0",
 ]
 
 if os.environ.get("CI", None):
