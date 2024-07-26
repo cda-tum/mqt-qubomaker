@@ -32,7 +32,7 @@ def evaluate(
     """
     settings = pf.PathFindingQUBOGeneratorSettings(encoding, n_paths, TEST_GRAPH.n_vertices, loop)
     formula = cost_function.get_formula(TEST_GRAPH, settings)
-    assignment = [
+    assignment: list[tuple[sp.Expr, sp.Expr | int | float]] = [
         (cf.FormulaHelpers.get_encoding_variable_one_hot(p + 1, TEST_GRAPH.n_vertices + 1, i + 1), 0)
         for p in range(settings.n_paths)
         for i in range(settings.max_path_length + 1)
@@ -56,7 +56,7 @@ def evaluate(
     ]
     return cast(
         int,
-        formula.subs(path)  # type: ignore[no-untyped-call]
+        formula.subs(path)
         .doit()
         .subs(path)
         .doit()
