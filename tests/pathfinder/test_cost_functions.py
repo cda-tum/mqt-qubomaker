@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 import pytest
 import sympy as sp
 
@@ -54,8 +52,7 @@ def evaluate(
         for i in range(TEST_GRAPH.n_vertices)
         for j in range(TEST_GRAPH.n_vertices)
     ]
-    return cast(
-        int,
+    return int(
         formula.subs(path)
         .doit()
         .subs(path)
