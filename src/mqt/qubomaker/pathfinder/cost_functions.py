@@ -34,11 +34,13 @@ class A(sp.Function):
     `A(v, w)` represents the weight of edge (v, w).
     """
 
-    def _latex(self, _printer: sp.StrPrinter, *_args: Any, **_kwargs: Any) -> str:
+    def _latex(self, printer: sp.StrPrinter, *args: Any, **kwargs: Any) -> str:  # noqa: ARG002
         """Returns the latex representation of the expression.
 
         Args:
-            _printer (sp.StrPrinter): The printer to use.
+            printer (sp.StrPrinter): The printer to use.
+            args (Any): Additional arguments.
+            kwargs (Any): Additional keyword arguments.
 
         Returns:
             str: The latex representation of the expression.
@@ -53,11 +55,13 @@ class X(sp.Function):
     `x(p, v, i)` represents a single binary variable. Its meaning depends on the encoding type.
     """
 
-    def _latex(self, _printer: sp.StrPrinter, *_args: Any, **_kwargs: Any) -> str:
+    def _latex(self, printer: sp.StrPrinter, *args: Any, **kwargs: Any) -> str:  # noqa: ARG002
         """Returns the latex representation of the expression.
 
         Args:
-            _printer (sp.StrPrinter): The printer to use.
+            printer (sp.StrPrinter): The printer to use.
+            args (Any): Additional arguments.
+            kwargs (Any): Additional keyword arguments.
 
         Returns:
             str: The latex representation of the expression.
@@ -73,11 +77,13 @@ class Decompose(sp.Function):
         `Decompose(5, 1)` represents digit 1 of the binary string `101`, i.e., 1.
     """
 
-    def _latex(self, _printer: sp.StrPrinter, *_args: Any, **_kwargs: Any) -> str:
+    def _latex(self, printer: sp.StrPrinter, *args: Any, **kwargs: Any) -> str:  # noqa: ARG002
         """Returns the latex representation of the expression.
 
         Args:
-            _printer (sp.StrPrinter): The printer to use.
+            printer (sp.StrPrinter): The printer to use.
+            args (Any): Additional arguments.
+            kwargs (Any): Additional keyword arguments.
 
         Returns:
             str: The latex representation of the expression.
@@ -126,7 +132,7 @@ class ExpandingSum(sp.Sum):
         result: sp.Expr = sp.Integer(0)
         (variable, from_value, to_value) = limits
         if not isinstance(from_value, sp.Integer) or not isinstance(to_value, sp.Integer):
-            return ExpandingSum(expr, list(reversed([limits, *remaining_limits])))
+            return ExpandingSum(expr, *list(reversed([limits, *remaining_limits])))
         for i in range(int(from_value), int(to_value) + 1):
             if len(remaining_limits) == 0:
                 result += expr.subs(variable, i)
@@ -192,11 +198,13 @@ class SumSet(sp.Expr):
         self.latex = latex
         self.element_expr = element_expr
 
-    def _latex(self, printer: sp.StrPrinter, *_args: Any, **_kwargs: Any) -> str:
+    def _latex(self, printer: sp.StrPrinter, *args: Any, **kwargs: Any) -> str:  # noqa: ARG002
         """Returns the latex representation of the expression.
 
         Args:
             printer (sp.StrPrinter): The printer to use.
+            args (Any): Additional arguments.
+            kwargs (Any): Additional keyword arguments.
 
         Returns:
             str: The latex representation of the expression.
