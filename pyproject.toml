@@ -121,6 +121,11 @@ pretty = true
 module = ["types-Pillow", "jsonschema", "tsplib95.*", "ipywidgets.*", "IPython.*", "qiskit.*", "qiskit_algorithms.*", "matplotlib.*", "networkx.*", "mqt.ddsim.*", "joblib.*", "qiskit_optimization.*", "docplex.*", "typing_extensions.*", "numpy.*"]
 ignore_missing_imports = true
 
+
+[tool.check-wheel-contents]
+ignore = ["W002"]  # Triggers on __init__.py's
+
+
 [tool.ruff]
 line-length = 120
 preview = true
