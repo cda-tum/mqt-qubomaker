@@ -45,19 +45,19 @@ repos:
 
   # Check for spelling
   - repo: https://github.com/crate-ci/typos
-    rev: v1.27.3
+    rev: typos-dict-v0.11.37
     hooks:
       - id: typos
 
   # Format configuration files with prettier
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: "v3.3.3"
+    rev: "v3.4.1"
     hooks:
       - id: prettier
         types_or: [yaml, markdown, html, css, javascript, json]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.4
+    rev: v0.8.1
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
