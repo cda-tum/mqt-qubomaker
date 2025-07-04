@@ -13,6 +13,7 @@ from . import pathfinder
 from .graph import Graph
 from .qubo_generator import QUBOGenerator
 from .utils import optimize_classically, print_matrix
+from .device import Calibration
 
 __all__ = [
     "Graph",
@@ -20,4 +21,5 @@ __all__ = [
     "optimize_classically",
     "pathfinder",
     "print_matrix",
+    "Calibration",
 ]
