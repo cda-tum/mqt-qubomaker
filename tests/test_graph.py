@@ -43,6 +43,8 @@ def test_read_write() -> None:
     with Path.open(Path("tests") / "resources" / "graph" / "graph", "r") as file:
         g2 = Graph.deserialize(file.read())
 
+    Path.unlink(Path("tests") / "resources" / "graph" / "graph")
+
     assert g == g2
 
 
