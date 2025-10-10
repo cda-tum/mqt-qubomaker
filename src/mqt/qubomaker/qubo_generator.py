@@ -684,18 +684,19 @@ class QuboGenerator:
         """
         return ""
 
-    def construct_qaoa_circuit(self, n_qubits: int = -1, do_reuse: bool = True) -> qiskit.QuantumCircuit:
+    def construct_qaoa_circuit(
+        self, n_qubits: int = -1, do_reuse: bool = True, include_barriers: bool = False
+    ) -> qiskit.QuantumCircuit:
         """Constructs a QAOA circuit for the QUBO problem.
 
         Args:
             n_qubits (int, optional): If given, sets the number of qubits for the full circuit.
             do_reuse (bool, optional): Attempt to reuse qubits to limit the number of variables. Defaults to True.
+            include_barriers (bool, optional): Whether to include barriers in the circuit. Defaults to False.
 
         Returns:
             qiskit.QuantumCircuit: The constructed QAOA circuit.
         """
-        include_barriers = False
-
         interactions = self.construct_interaction_graph(for_embedding=False)
         qubits = max(starmap(max, interactions)) + 1
         circuit = qiskit.QuantumCircuit(n_qubits if n_qubits != -1 else qubits, qubits)
