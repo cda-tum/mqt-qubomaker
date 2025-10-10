@@ -592,7 +592,7 @@ class QuboGenerator:
             auxiliary_expansions (SlackChainAssignment): Information about the auxiliary variable expansions.
 
         Returns:
-            dict[sp.Expr, int]: An assignment dictionary, mappingeach `y_k` to its value in {0, 1}.
+            dict[sp.Expr, int]: An assignment dictionary, mapping each `y_k` to its value in {0, 1}.
         """
         auxiliary_values: dict[str, int] = {}
         encoding_variables = {str(key): value for key, value in self._get_encoding_variables()}
