@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union, cast
+from typing import TYPE_CHECKING, cast
 
 import networkx as nx
 import numpy as np
@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 if TYPE_CHECKING:
     from io import TextIOWrapper
 
-    Edge = Union[tuple[int, int], tuple[int, int, int], tuple[int, int, float]]
+    Edge = tuple[int, int] | tuple[int, int, int] | tuple[int, int, float]
 
 
 class Graph:
