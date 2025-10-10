@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -96,8 +97,8 @@ def paths_equal_with_loops(a: list[int], b: list[int]) -> bool:
     """
     if len(a) != len(b):
         return False
-    edges_a = [*list(zip(a[:-1], a[1:])), (a[-1], a[0])]
-    edges_b = [*list(zip(b[:-1], b[1:])), (b[-1], b[0])]
+    edges_a = [*list(itertools.pairwise(a)), (a[-1], a[0])]
+    edges_b = [*list(itertools.pairwise(b)), (b[-1], b[0])]
     edges_a = sorted(edges_a)
     edges_b = sorted(edges_b)
     return edges_a == edges_b
