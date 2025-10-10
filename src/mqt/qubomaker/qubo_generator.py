@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import functools
-from itertools import starmap
+from itertools import pairwise, starmap
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -869,7 +869,7 @@ class QuboGenerator:
                 add_rzz(group[0], group[1])
                 covered_interactions.add((variable_indices[group[0]], variable_indices[group[1]]))
         for groups in chain_groups:
-            for g1, g2 in zip(groups[:-1], groups[1:]):
+            for g1, g2 in pairwise(groups):
                 add_rzz(g1[1], g2[0])
                 covered_interactions.add((variable_indices[g1[1]], variable_indices[g2[0]]))
                 covered_interactions.add((
@@ -890,11 +890,11 @@ class QuboGenerator:
 
         incomplete_swaps = {}
         for groups in chain_groups:
-            for g1, g2 in zip(groups[::2], groups[1::2]):
+            for g1, g2 in zip(groups[::2], groups[1::2], strict=False):
                 add_swap(g1[0], g1[1], False)
                 add_rzz(g1[1], g2[0])
                 add_swap(g1[0], g1[1], False)
-            for g1, g2 in zip(groups[1::2], groups[2::2]):
+            for g1, g2 in zip(groups[1::2], groups[2::2], strict=False):
                 incomplete_swaps[g1[0]] = g1[1]
                 incomplete_swaps[g1[1]] = g1[0]
                 add_swap(g1[0], g1[1], False)

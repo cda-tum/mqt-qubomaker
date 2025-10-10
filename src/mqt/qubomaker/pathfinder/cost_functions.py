@@ -6,7 +6,7 @@ import functools
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import sympy as sp
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
     GetVariableFunction = Callable[[Any, Any, Any, int], sp.Expr]
 
-SetCallback = Callable[[], list[Union[sp.Expr, int, float, tuple[Union[sp.Expr, int, float], ...]]]]
+SetCallback = Callable[[], list[sp.Expr | int | float | tuple[sp.Expr | int | float, ...]]]
 
 
 class EncodingType(Enum):
@@ -286,7 +286,7 @@ class FormulaHelpers:
         variable_symbols = [FormulaHelpers.variable(v) for v in variables]
         assignments = [x if isinstance(x, tuple) else (x,) for x in callback()]
         expr = functools.reduce(
-            lambda total, new: total + expression.subs(dict(zip(variable_symbols, new))),
+            lambda total, new: total + expression.subs(dict(zip(variable_symbols, new, strict=False))),
             assignments,
             cast("sp.Expr", sp.Integer(0)),
         )
@@ -1223,7 +1223,7 @@ class PathsShareNoEdges(PathComparison):
             ),
             ["v", "w"],
             "\\in E",
-            lambda: cast("list[Union[sp.Expr, int, float, tuple[Union[sp.Expr, int, float], ...]]]", graph.all_edges),
+            lambda: cast("list[sp.Expr | int | float | tuple[sp.Expr | int | float, ...]]", graph.all_edges),
         )
 
 
@@ -1261,9 +1261,7 @@ class PathIsValid(PathBound):
                 ),
                 ["v", "w"],
                 "\\not\\in E",
-                lambda: cast(
-                    "list[Union[sp.Expr, int, float, tuple[Union[sp.Expr, int, float], ...]]]", graph.non_edges
-                ),
+                lambda: cast("list[sp.Expr | int | float | tuple[sp.Expr | int | float, ...]]", graph.non_edges),
             ),
             self.path_ids,
         )
@@ -1341,9 +1339,7 @@ class MinimizePathLength(PathBound):
                 ),
                 ["v", "w"],
                 "\\in E",
-                lambda: cast(
-                    "list[Union[sp.Expr, int, float, tuple[Union[sp.Expr, int, float], ...]]]", graph.all_edges
-                ),
+                lambda: cast("list[sp.Expr | int | float | tuple[sp.Expr | int | float, ...]]", graph.all_edges),
             ),
             self.path_ids,
         )
@@ -1380,9 +1376,7 @@ class MaximizePathLength(PathBound):
                 ),
                 ["v", "w"],
                 "\\in E",
-                lambda: cast(
-                    "list[Union[sp.Expr, int, float, tuple[Union[sp.Expr, int, float], ...]]]", graph.all_edges
-                ),
+                lambda: cast("list[sp.Expr | int | float | tuple[sp.Expr | int | float, ...]]", graph.all_edges),
             ),
             self.path_ids,
         )
