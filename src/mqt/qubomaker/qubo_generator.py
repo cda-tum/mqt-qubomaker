@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from mqt.qubomaker.device import Calibration
 
 
-class EmbeddedSlackChainAssignment:
+class SlackChainAssignment:
     """Stores assignment information for a chain of variables in a QUBO formulation."""
 
     chains: list[list[str]]
@@ -26,7 +26,7 @@ class EmbeddedSlackChainAssignment:
     indices: dict[str, int]
 
     def __init__(self) -> None:
-        """Creates a new EmbeddedSlackChainAssignment instance."""
+        """Creates a new SlackChainAssignment instance."""
         self.chains = []
         self.indices = {}
         self.slack_dict = {}
@@ -135,7 +135,7 @@ class QUBOGenerator:
 
     def construct_expansion(
         self, include_slack_information: bool = False, for_embedding: bool = True
-    ) -> sp.Expr | tuple[sp.Expr, EmbeddedSlackChainAssignment]:
+    ) -> sp.Expr | tuple[sp.Expr, SlackChainAssignment]:
         """Constructs a mathematical representation of the QUBO formulation and expands it.
 
         This will expand sum and product terms into full sums and products of each of their elements.
@@ -153,13 +153,15 @@ class QUBOGenerator:
         if isinstance(expression, sp.Expr):
             expression = self._construct_expansion(expression).expand()
         expression = expression.doit().expand()
-        embedded_assignment = EmbeddedSlackChainAssignment()
+        embedded_assignment = SlackChainAssignment()
         if for_embedding:
             unifying_substitution = {var: sp.Symbol(f"x_{i}") for (var, i) in self._get_encoding_variables()}
             expression = expression.subs(unifying_substitution)
             expression = self.expand_higher_order_terms(expression, embedded_assignment)
         else:
-            expression = self.expand_higher_order_terms_greedy_minimization(expression)
+            expression = self.expand_higher_order_terms_greedy_minimization(expression, embedded_assignment)
+            for symbol in list(expression.free_symbols) + [tup[0] for tup in self._get_encoding_variables()]:  # type: ignore[attr-defined]
+                expression = expression.subs({symbol**2: symbol})
         self.expansion_cache = expression
 
         if include_slack_information:
@@ -168,13 +170,13 @@ class QUBOGenerator:
         return expression
 
     def expand_higher_order_terms(
-        self, expression: sp.Expr, assignment: EmbeddedSlackChainAssignment, chain_index: int = 1
+        self, expression: sp.Expr, assignment: SlackChainAssignment, chain_index: int = 1
     ) -> sp.Expr:
         """Expands higher order terms in a cost function to reduce the order.
 
         Args:
             expression (sp.Expr): The expression to transform.
-            assignment (EmbeddedSlackChainAssignment): The assignment to store information about the slack variables.
+            assignment (SlackChainAssignment): The assignment to store information about the slack variables.
             chain_index (int, optional): The index of the current chain of auxiliary variables. Defaults to 1.
 
         Returns:
@@ -268,7 +270,7 @@ class QUBOGenerator:
         self,
         expression: sp.Expr,
         last_slack: sp.Symbol,
-        assignment: EmbeddedSlackChainAssignment,
+        assignment: SlackChainAssignment,
         chain_index: int,
         index: int,
     ) -> sp.Expr:
@@ -310,7 +312,9 @@ class QUBOGenerator:
         new_expr += equality_penalty
         return self.__continue_slack_chain(new_expr, y, assignment, chain_index, index + 1)
 
-    def expand_higher_order_terms_greedy_minimization(self, expression: sp.Expr) -> sp.Expr:
+    def expand_higher_order_terms_greedy_minimization(
+        self, expression: sp.Expr, assignment: SlackChainAssignment
+    ) -> sp.Expr:
         """Reduce the order of higher order terms in a cost function by employing greedy variable minimization.
 
         Generally, attempts to keep the number of auxiliary variables low by selecting the most frequently occurring
@@ -318,6 +322,7 @@ class QUBOGenerator:
 
         Args:
             expression (sp.Expr): The expression to transform.
+            assignment (SlackChainAssignment): The assignment to store information about the slack variables.
 
         Returns:
             sp.Expr: The transformed expression.
@@ -345,7 +350,9 @@ class QUBOGenerator:
             counts: dict[tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function], int] = {}
             highest_key: tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function] | None = None
             for term in problematic_terms:
-                symbols = sorted(term.free_symbols, key=str)  # type: ignore[attr-defined]
+                symbols = sorted(
+                    [symbol for symbol in term.args if isinstance(symbol, (sp.Function, sp.Symbol))], key=str
+                )
                 for s1 in symbols:
                     for s2 in symbols:
                         if s1 == s2:
@@ -364,54 +371,10 @@ class QUBOGenerator:
 
             slack_count += 1
             y = sp.Symbol(f"y_{slack_count}")
+            assignment.add_slack_variable(str(y), str(selected_variables[0]), str(selected_variables[1]))
             expression = expression.subs({highest_key[0] * highest_key[1]: y}) + self.__get_slack_penalty(
                 selected_variables[0], selected_variables[1], y
             )
-
-    def expand_higher_order_terms_no_embedding(self, expression: sp.Expr) -> sp.Expr:
-        """Expands a mathematical QUBO expression.
-
-        Terms of order 3 or higher will be transformed into quadratic terms by adding auxiliary variables recursively until
-        the order is 2.
-
-        Args:
-            expression (sp.Expr): The expression to transform.
-
-        Returns:
-            sp.Expr: The transformed expression.
-        """
-        result: sp.Expr | float = 0
-        auxiliary_dict: dict[sp.Expr, sp.Expr] = {}
-        coeffs = expression.as_coefficients_dict()
-        for term in coeffs:
-            unpowered = self.__unpower(term)
-            unpowered = self.__simplify_auxiliary_variables(unpowered, auxiliary_dict)
-            order = self.__get_order(unpowered)
-            if order <= 2:
-                result += unpowered * coeffs[term]
-                continue
-            new_term = self.__decrease_order(unpowered, auxiliary_dict)
-            result += new_term * coeffs[term]
-        self.auxiliary_cache = auxiliary_dict
-        return cast("sp.Expr", result)
-
-    @staticmethod
-    def __simplify_auxiliary_variables(expression: sp.Expr, auxiliary_dict: dict[sp.Expr, sp.Expr]) -> sp.Expr:
-        """Minimizes the number of requires auxiliary variables by removing products that have already been transformed in previous steps.
-
-        Args:
-            expression (sp.Expr): The expression to optimize
-            auxiliary_dict (dict[sp.Expr, sp.Expr]): A dictionary mapping existing products of variables to their resulting auxiliary variable.
-
-        Returns:
-            sp.Expr: The optimized expression.
-        """
-        if not isinstance(expression, sp.Mul):
-            return expression
-        used_auxiliaries = {term for term in expression.args if term in auxiliary_dict.values()}
-        redundant_variables = {term for term in auxiliary_dict if auxiliary_dict[term] in used_auxiliaries}
-        remaining_variables = [arg for arg in expression.args if arg not in redundant_variables]
-        return sp.Mul(*remaining_variables) if len(remaining_variables) > 1 else remaining_variables[0]
 
     def __optimal_decomposition(
         self, terms: tuple[sp.Expr, ...], auxiliary_dict: dict[sp.Expr, sp.Expr]
@@ -554,7 +517,7 @@ class QUBOGenerator:
                 return auxiliary_variables.index(cast("sp.Symbol", variable)) + self.get_encoding_variable_count()
 
         else:
-            expansion_result: tuple[sp.Expr, EmbeddedSlackChainAssignment] = self.construct_expansion(  # type: ignore[assignment]
+            expansion_result: tuple[sp.Expr, SlackChainAssignment] = self.construct_expansion(  # type: ignore[assignment]
                 include_slack_information=True, for_embedding=for_embedding
             )
             expr, assignment = expansion_result
@@ -581,7 +544,7 @@ class QUBOGenerator:
 
         return result
 
-    def get_cost(self, assignment: list[int]) -> float:
+    def get_cost(self, assignment: list[int], for_embedding: bool = False) -> float:
         """Given an assignment, computes the total cost value of the corresponding cost function evaluation.
 
         The assignment is given as a binary list, and can either contain assignments for just encoding variables
@@ -589,6 +552,7 @@ class QUBOGenerator:
 
         Args:
             assignment (list[int]): The assignment for each variable (either 0 or 1).
+            for_embedding (bool, optional): Whether to prepare the QUBO for embedding on a quantum device. Defaults to False.
 
         Returns:
             float: The cost value for the assignment.
@@ -597,11 +561,14 @@ class QUBOGenerator:
             msg = "Provided values are not binary (1/0)"
             raise ValueError(msg)
 
-        expansion: sp.Expr = self.construct_expansion()  # type: ignore[assignment]
+        full_expansion: tuple[sp.Expr, SlackChainAssignment] = self.construct_expansion(
+            for_embedding=for_embedding, include_slack_information=True
+        )  # type: ignore[assignment]
+        expansion, auxiliary_expansions = full_expansion
         auxiliary_assignment: dict[sp.Expr, int] = {}
 
         if len(assignment) == self.get_encoding_variable_count():
-            auxiliary_assignment = self.__get_auxiliary_assignment(assignment)
+            auxiliary_assignment = self.__get_auxiliary_assignment(assignment, auxiliary_expansions)
         elif len(assignment) != self.count_required_variables():
             msg = "Invalid assignment length."
             raise ValueError(msg)
@@ -610,7 +577,9 @@ class QUBOGenerator:
         variable_assignment.update(auxiliary_assignment)
         return expansion.subs(variable_assignment).evalf()
 
-    def __get_auxiliary_assignment(self, assignment: list[int]) -> dict[sp.Expr, int]:
+    def __get_auxiliary_assignment(
+        self, assignment: list[int], auxiliary_expansions: SlackChainAssignment
+    ) -> dict[sp.Expr, int]:
         """Generates the assignment of auxiliary variables based on a given encoding variable assignment.
 
         Every auxiliary variable is defined like `y_k = x_i * x_j`, `y_k = x_i * y_j` or `y_k = y_i * y_j`.
@@ -620,15 +589,16 @@ class QUBOGenerator:
 
         Args:
             assignment (list[int]): The assignment for the encoding variables `x_i`.
+            auxiliary_expansions (SlackChainAssignment): Information about the auxiliary variable expansions.
 
         Returns:
             dict[sp.Expr, int]: An assignment dictionary, mappingeach `y_k` to its value in {0, 1}.
         """
-        auxiliary_values: dict[sp.Expr, int] = {}
-        encoding_variables = dict(self._get_encoding_variables())
-        remaining_variables = set(self.auxiliary_cache.keys())
+        auxiliary_values: dict[str, int] = {}
+        encoding_variables = {str(key): value for key, value in self._get_encoding_variables()}
+        remaining_variables = set(auxiliary_expansions.slack_dict.keys())
 
-        def get_var_value(var: sp.Expr) -> int | None:
+        def get_var_value(var: str) -> int | None:
             if var in encoding_variables:
                 return assignment[encoding_variables[var] - 1]
             if var in auxiliary_values:
@@ -638,16 +608,16 @@ class QUBOGenerator:
         while remaining_variables:
             to_remove = []
             for aux in remaining_variables:
-                (left, right) = aux.args[0], aux.args[1]
+                (left, right) = auxiliary_expansions.slack_dict[aux]
                 left_val = get_var_value(left)
                 right_val = get_var_value(right)
                 if left_val is not None and right_val is not None:
-                    auxiliary_values[self.auxiliary_cache[aux]] = left_val * right_val
+                    auxiliary_values[aux] = left_val * right_val
                     to_remove.append(aux)
             for aux in to_remove:
                 remaining_variables.remove(aux)
 
-        return auxiliary_values
+        return {sp.Symbol(key): value for key, value in auxiliary_values.items()}
 
     def _get_encoding_variables(self) -> list[tuple[sp.Expr, int]]:
         """Returns all non-auxiliary variables used in the QUBO formulation.
@@ -811,7 +781,7 @@ class QUBOGenerator:
         Returns:
             qiskit.QuantumCircuit: The constructed QAOA circuit.
         """
-        expansion: tuple[sp.Expr, EmbeddedSlackChainAssignment] = self.construct_expansion(
+        expansion: tuple[sp.Expr, SlackChainAssignment] = self.construct_expansion(
             include_slack_information=True, for_embedding=True
         )  # type: ignore[assignment]
         expression, assignment = expansion

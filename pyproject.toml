@@ -96,6 +96,7 @@ xfail_strict = true
 filterwarnings = [
     "error",
     "ignore:.*invalid escape sequence.*::.*docplex.*",
+    "ignore::matplotlib._api.deprecation.MatplotlibDeprecationWarning:pydev",
 ]
 
 [tool.coverage]
