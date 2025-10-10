@@ -1,9 +1,15 @@
+"""Represents device information and utility methods for quantum devices."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Any
+
 
 @dataclass
 class Calibration:
+    """Represents a device calibration including its qubit connectivities and gate fidelities."""
+
     num_qubits: int
 
     one_qubit: dict[int, float]
@@ -15,11 +21,11 @@ class Calibration:
     heavy: dict[int, list[int]] = field(init=False)
     heavy_children: dict[int, list[int]] = field(init=False)
 
-
     t1: dict[int, float]
     t2: dict[int, float]
 
     def __post_init__(self) -> None:
+        """Post-initialization to set up connections and heavy nodes."""
         self.connections_dict = {}
         for i, j in self.two_qubit:
             if i not in self.connections_dict:
@@ -38,9 +44,8 @@ class Calibration:
                         self.heavy_children[connection] = []
                     self.heavy_children[connection].append(qubit)
 
-
     @classmethod
-    def from_dict(cls, data: dict, basis_gates: list[str]) -> Calibration:
+    def from_dict(cls, data: dict[str, Any], basis_gates: list[str]) -> Calibration:
         """Create a Calibration object from a dictionary."""
         return cls(
             num_qubits=data["num_qubits"],
@@ -53,15 +58,57 @@ class Calibration:
         )
 
     def get_shared_neighbor(self, q1: int, q2: int) -> int:
+        """Given two qubits in the heavy-hex topology, find a qubit that is connected to both.
+
+        Args:
+            q1 (int): The first qubit.
+            q2 (int): The second qubit.
+
+        Returns:
+            int: The shared neighbor qubit, or -1 if none exists.
+        """
         for x in self.connections_dict[q1]:
             if x in self.connections_dict[q2]:
                 return x
         return -1
-    
+
     def get_connected_qubit_chain(self) -> list[int]:
+        """Compute the longest possible hamiltonian path through the device topology.
+
+        Returns:
+            list[int]: The longest Hamiltonian path through the qubit connectivity graph.
+        """
+        # To compute the start that leasts to the longest Hamiltonian path, we look for qubits with only one connection.
+        # Sometimes, these might not be directly connected to a heavy node, so we keep traversing until we find one that is.
+        # That qubit is then the start of the longest Hamiltonian path.
         potential_starts = [x for x in self.connections_dict if len(self.connections_dict[x]) == 1]
-        assert len(potential_starts) == 2, "There should be exactly two potential starts for the connected qubit chain."
-        start = potential_starts[0]
+        assert len(potential_starts) >= 2, "There should be exactly two potential starts for the connected qubit chain."
+        start = min(potential_starts)
+
+        # To check if `start` is connected to a heavy node, we check whether its successsor has more than two connections.
+        # Otherwise, we proceed to the successor.
+        def get_next(current: int, previous: int) -> int:
+            """Compute the next qubit in the chain.
+
+            Args:
+                current (int): The current qubit to find the successor for.
+                previous (int): The previous qubit in the chain.
+
+            Returns:
+                int: The next qubit in the chain, or -1 if none exists.
+            """
+            for x in self.connections_dict[current]:
+                if x != previous:
+                    return x
+            return -1
+
+        previous = -1
+        while len(self.connections_dict[get_next(start, previous)]) == 2:
+            p = start
+            start = get_next(start, previous)
+            previous = p
+
+        # We traverse through the heavy-hex topology to get the longest Hamiltonian path.
         path = [start]
         current = start
         while True:
@@ -72,9 +119,14 @@ class Calibration:
             current = successor_distances[0][1]
             path.append(current)
         return path
-    
+
     def get_heavy_chain(self) -> list[int]:
-        heavy_graph = {}
+        """Find a chain of heavy nodes in the heavy-hex topology that are connected through shared children.
+
+        Returns:
+            list[int]: A chain of heavy nodes connected through shared children.
+        """
+        heavy_graph: dict[int, list[int]] = {}
         for x, children in self.heavy.items():
             heavy_graph[x] = []
             for child in children:
@@ -83,7 +135,7 @@ class Calibration:
                         heavy_graph[x].append(other)
         potential_starts = [x for x in heavy_graph if len(heavy_graph[x]) == 1]
         potential_starts = [x for x in potential_starts if len(heavy_graph[heavy_graph[x][0]]) == 2]
-        
+
         heavy_chain = [potential_starts[0]]
         while True:
             current = heavy_chain[-1]
@@ -102,14 +154,14 @@ class Calibration:
             else:
                 heavy_chain.append(s_b)
         return heavy_chain
-    
+
+
 TEST_500 = Calibration(
     num_qubits=500,
-    one_qubit={i: 0.99 for i in range(500)},
+    one_qubit=dict.fromkeys(range(500), 0.99),
     two_qubit={(i, i + 1): 0.99 for i in range(499)},
-    measurement_confidences={i: 0.99 for i in range(500)},
+    measurement_confidences=dict.fromkeys(range(500), 0.99),
     basis_gates=["cz", "id", "rx", "rz", "rzz", "sx", "x"],
-    t1={i: 100e-6 for i in range(500)},
-    t2={i: 200e-6 for i in range(500)},
+    t1=dict.fromkeys(range(500), 0.0001),
+    t2=dict.fromkeys(range(500), 0.0002),
 )
-    

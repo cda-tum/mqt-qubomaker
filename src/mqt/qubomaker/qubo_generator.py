@@ -3,37 +3,42 @@
 from __future__ import annotations
 
 import functools
+from itertools import starmap
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import numpy.typing as npt
+import qiskit
 import qiskit.circuit
 import sympy as sp
 
-import qiskit
+if TYPE_CHECKING:
+    from collections.abc import Collection
 
-from mqt.qubomaker.device import Calibration
-#from qiskit.primitives import BaseSamplerV2, StatevectorSampler
-#from qiskit_algorithms import QAOA
-#from qiskit_algorithms.optimizers import COBYLA, Optimizer
-#from qiskit_algorithms.utils import algorithm_globals
-#from qiskit_optimization import QuadraticProgram
-#from qiskit_optimization.converters import QuadraticProgramToQubo
+    from mqt.qubomaker.device import Calibration
 
-#if TYPE_CHECKING:
-#    from qiskit.quantum_info import SparsePauliOp 
 
 class EmbeddedSlackChainAssignment:
+    """Stores assignment information for a chain of variables in a QUBO formulation."""
+
     chains: list[list[str]]
     slack_dict: dict[str, tuple[str, str]]
     indices: dict[str, int]
 
     def __init__(self) -> None:
+        """Creates a new EmbeddedSlackChainAssignment instance."""
         self.chains = []
         self.indices = {}
         self.slack_dict = {}
 
     def add_slack_variable(self, new_slack: str, replace_1: str, replace_2: str) -> None:
+        """Adds a new auxiliary variable to the assignment, replacing the two given existing variables.
+
+        Args:
+            new_slack (str): The new auxiliary variable.
+            replace_1 (str): The first variable to be replaced.
+            replace_2 (str): The second variable to be replaced.
+        """
         self.slack_dict[new_slack] = (replace_1, replace_2)
         parts = new_slack.split("_")
         chain_index = int(parts[1]) - 1
@@ -42,22 +47,25 @@ class EmbeddedSlackChainAssignment:
         self.chains[chain_index].append(new_slack)
 
     def compute_indices(self, expr: sp.Expr, offset: int = 0) -> None:
-        symbols = [str(s) for s in expr.free_symbols]
+        """Computes the indices of all variables in the assignment based on their names and stores them as a side-effect.
+
+        Args:
+            expr (sp.Expr): The expression to analyze.
+            offset (int, optional): The starting offset. Defaults to 0.
+        """
+        symbols = [str(s) for s in expr.free_symbols]  # type: ignore[attr-defined]
         prime_symbols = [s for s in symbols if s.endswith("'")]
         encoding_symbols = [s for s in symbols if not s.endswith("'") and s.startswith("x_")]
         slack_symbols = [s for s in symbols if not s.endswith("'") and s.startswith("y_")]
         self.indices.clear()
         for enc in encoding_symbols:
             self.indices[enc] = int(enc[2:]) - 1 + offset
-        slack_symbols.sort(key=lambda x: tuple([int(i) for i in x[2:].split("_")]))
+        slack_symbols.sort(key=lambda x: tuple(int(i) for i in x[2:].split("_")))
         for slack in slack_symbols:
             self.indices[slack] = len(self.indices)
         prime_symbols.sort(key=lambda x: tuple([x.count("'")] + [int(i) for i in x.replace("'", "")[2:].split("_")]))
         for prime in prime_symbols:
             self.indices[prime] = len(self.indices)
-        
-
-        
 
 
 class QUBOGenerator:
@@ -78,9 +86,11 @@ class QUBOGenerator:
 
     auxiliary_cache: dict[sp.Expr, sp.Expr]
 
-    smart_slack: bool = True # TODO improve
+    smart_slack: bool = True  # TODO improve
 
-    disable_caching: bool = False  # If set to True, the caching of the expansion will be disabled. This is useful for debugging.
+    disable_caching: bool = (
+        False  # If set to True, the caching of the expansion will be disabled. This is useful for debugging.
+    )
 
     def __init__(self, objective_function: sp.Expr | None) -> None:
         """Initializes a new QUBOGenerator instance.
@@ -123,7 +133,9 @@ class QUBOGenerator:
             ),
         )
 
-    def construct_expansion(self, include_slack_information: bool = False, for_embedding: bool = True) -> sp.Expr | tuple[sp.Expr, EmbeddedSlackChainAssignment]:
+    def construct_expansion(
+        self, include_slack_information: bool = False, for_embedding: bool = True
+    ) -> sp.Expr | tuple[sp.Expr, EmbeddedSlackChainAssignment]:
         """Constructs a mathematical representation of the QUBO formulation and expands it.
 
         This will expand sum and product terms into full sums and products of each of their elements.
@@ -143,9 +155,7 @@ class QUBOGenerator:
         expression = expression.doit().expand()
         embedded_assignment = EmbeddedSlackChainAssignment()
         if for_embedding:
-            unifying_substitution = {
-                var: sp.Symbol(f"x_{i}") for (var, i) in self._get_encoding_variables()
-            }
+            unifying_substitution = {var: sp.Symbol(f"x_{i}") for (var, i) in self._get_encoding_variables()}
             expression = expression.subs(unifying_substitution)
             expression = self.expand_higher_order_terms(expression, embedded_assignment)
         else:
@@ -156,18 +166,36 @@ class QUBOGenerator:
             embedded_assignment.compute_indices(expression)
             return expression, embedded_assignment
         return expression
-    
-    def expand_higher_order_terms(self, expression: sp.Expr, assignment: EmbeddedSlackChainAssignment, chain_index: int = 1) -> sp.Expr:
-        assert isinstance(expression, sp.Add) or isinstance(expression, sp.Mul), f"We expect a sum of products or a single product as input but got {expression}"
-        problematic_terms = self.__get_problematic_terms(expression.args) if isinstance(expression, sp.Add) else self.__get_problematic_terms([expression])
-        
+
+    def expand_higher_order_terms(
+        self, expression: sp.Expr, assignment: EmbeddedSlackChainAssignment, chain_index: int = 1
+    ) -> sp.Expr:
+        """Expands higher order terms in a cost function to reduce the order.
+
+        Args:
+            expression (sp.Expr): The expression to transform.
+            assignment (EmbeddedSlackChainAssignment): The assignment to store information about the slack variables.
+            chain_index (int, optional): The index of the current chain of auxiliary variables. Defaults to 1.
+
+        Returns:
+            sp.Expr: The transformed expression.
+        """
+        assert isinstance(expression, (sp.Add, sp.Mul)), (  # type: ignore[attr-defined]
+            f"We expect a sum of products or a single product as input but got {expression}"
+        )
+        problematic_terms = (
+            self.__get_problematic_terms(expression.args)
+            if isinstance(expression, sp.Add)  # type: ignore[attr-defined]
+            else self.__get_problematic_terms([expression])
+        )
+
         if not problematic_terms:
             return expression
-        
+
         counts: dict[tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function], int] = {}
         highest_key: tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function] | None = None
         for term in problematic_terms:
-            symbols = sorted(term.free_symbols, key=lambda s: str(s), reverse=True)
+            symbols = sorted(term.free_symbols, key=str, reverse=True)  # type: ignore[attr-defined]
             for s1 in symbols:
                 for s2 in symbols:
                     if s1 == s2:
@@ -178,31 +206,41 @@ class QUBOGenerator:
                     counts[key] += 1
                     if highest_key is None or counts[key] > counts[highest_key]:
                         highest_key = key
+        if highest_key is None:
+            msg = "Error reducing cost function order: No highest key found, but problematic terms still exist."
+            raise RuntimeError(msg)
 
         selected_variables = [highest_key[0], highest_key[1]]
-        equality_penality = 0
+        equality_penalty: sp.Expr = sp.Integer(0)
         if any(str(selected_variables[0]) in x for x in assignment.slack_dict.values()):
             old_var = selected_variables[0]
             current = selected_variables[0]
             while any(str(current) in x for x in assignment.slack_dict.values()):
                 current = sp.Symbol(f"{current}'")
             selected_variables[0] = current
-            equality_penality += old_var + selected_variables[0] - old_var * selected_variables[0] # introduce (x - x')^2 as penalty.
+            equality_penalty += (
+                old_var + selected_variables[0] - old_var * selected_variables[0]
+            )  # introduce (x - x')^2 as penalty.
         if any(str(selected_variables[1]) in x for x in assignment.slack_dict.values()):
             old_var = selected_variables[1]
             current = selected_variables[1]
             while any(str(current) in x for x in assignment.slack_dict.values()):
                 current = sp.Symbol(f"{current}'")
             selected_variables[1] = current
-            equality_penality += old_var + selected_variables[1] - old_var * selected_variables[1] # introduce (x - x')^2 as penalty.
-        
+            equality_penalty += (
+                old_var + selected_variables[1] - old_var * selected_variables[1]
+            )  # introduce (x - x')^2 as penalty.
+
         y = sp.Symbol(f"y_{chain_index}_1")
         assignment.add_slack_variable(str(y), str(selected_variables[0]), str(selected_variables[1]))
-        new_expr = expression.subs({highest_key[0] * highest_key[1]: y}) + self.__get_slack_penalty(selected_variables[0], selected_variables[1], y)
-        new_expr += equality_penality
+        new_expr = expression.subs({highest_key[0] * highest_key[1]: y}) + QUBOGenerator.__get_slack_penalty(
+            selected_variables[0], selected_variables[1], y
+        )
+        new_expr += equality_penalty
         return self.__continue_slack_chain(new_expr, y, assignment, chain_index, 1)
-    
-    def __get_slack_penalty(self, x1: sp.Expr, x2: sp.Expr, y: sp.Symbol) -> sp.Expr:
+
+    @classmethod
+    def __get_slack_penalty(cls, x1: sp.Expr, x2: sp.Expr, y: sp.Symbol) -> sp.Expr:
         """Computes the slack penalty for a given pair of variables and an auxiliary variable.
 
         Args:
@@ -213,9 +251,9 @@ class QUBOGenerator:
         Returns:
             sp.Expr: The slack penalty expression.
         """
-        return x1 * x2 - 2 * y * x1 - 2 * y * x2 + 3 * y
-    
-    def __get_problematic_terms(self, terms: list[sp.Mul]) -> list[sp.Mul]:
+        return 100 * x1 * x2 - 200 * y * x1 - 200 * y * x2 + 300 * y
+
+    def __get_problematic_terms(self, terms: Collection[sp.Mul]) -> list[sp.Mul]:
         problematic_terms: list[sp.Mul] = []
         for term in terms:
             unpowered = self.__unpower(term)
@@ -226,8 +264,15 @@ class QUBOGenerator:
             problematic_terms.append(unpowered)
         return problematic_terms
 
-    def __continue_slack_chain(self, expression: sp.Add, last_slack: sp.Symbol, assignment: EmbeddedSlackChainAssignment, chain_index: int, index: int) -> sp.Add:
-        problematic_terms = self.__get_problematic_terms(expression.args)
+    def __continue_slack_chain(
+        self,
+        expression: sp.Expr,
+        last_slack: sp.Symbol,
+        assignment: EmbeddedSlackChainAssignment,
+        chain_index: int,
+        index: int,
+    ) -> sp.Expr:
+        problematic_terms = self.__get_problematic_terms(cast("Collection[sp.Mul]", expression.args))
 
         if not problematic_terms:
             return expression
@@ -235,7 +280,7 @@ class QUBOGenerator:
         counts: dict[sp.Symbol | sp.Function, int] = {}
         highest_key: sp.Symbol | sp.Function | None = None
         for term in problematic_terms:
-            symbols = sorted(term.free_symbols, key=lambda s: str(s), reverse=True)
+            symbols = sorted(term.free_symbols, key=str, reverse=True)  # type: ignore[attr-defined]
             if last_slack not in symbols:
                 continue
             for s in symbols:
@@ -246,36 +291,61 @@ class QUBOGenerator:
                 counts[s] += 1
                 if highest_key is None or counts[s] > counts[highest_key]:
                     highest_key = s
-        
+
         if highest_key is None:
             return self.expand_higher_order_terms(expression, assignment, chain_index + 1)
         selected_replacement = highest_key
-        equality_penality = 0
+        equality_penalty: sp.Expr = sp.Integer(0)
         if any(str(selected_replacement) in x for x in assignment.slack_dict.values()):
             while any(str(selected_replacement) in x for x in assignment.slack_dict.values()):
                 selected_replacement = sp.Symbol(f"{selected_replacement}'")
-            equality_penality += highest_key + selected_replacement - highest_key * selected_replacement  # introduce (x - x')^2 as penalty.
+            equality_penalty += (
+                100 * highest_key + 100 * selected_replacement - 100 * highest_key * selected_replacement
+            )  # introduce (x - x')^2 as penalty.
         y = sp.Symbol(f"y_{chain_index}_{index + 1}")
         assignment.add_slack_variable(str(y), str(last_slack), str(selected_replacement))
-        new_expr = expression.subs({last_slack * highest_key: y}) + self.__get_slack_penalty(last_slack, selected_replacement, y)
-        new_expr += equality_penality
+        new_expr = expression.subs({last_slack * highest_key: y}) + self.__get_slack_penalty(
+            last_slack, selected_replacement, y
+        )
+        new_expr += equality_penalty
         return self.__continue_slack_chain(new_expr, y, assignment, chain_index, index + 1)
-        
+
     def expand_higher_order_terms_greedy_minimization(self, expression: sp.Expr) -> sp.Expr:
-        assert isinstance(expression, sp.Add) or isinstance(expression, sp.Mul), f"We expect a sum of products or a single product as input but got {expression}"
+        """Reduce the order of higher order terms in a cost function by employing greedy variable minimization.
+
+        Generally, attempts to keep the number of auxiliary variables low by selecting the most frequently occurring
+        products of variables to replace first.
+
+        Args:
+            expression (sp.Expr): The expression to transform.
+
+        Returns:
+            sp.Expr: The transformed expression.
+        """
+        assert isinstance(expression, (sp.Add, sp.Mul)), (  # type: ignore[attr-defined]
+            f"We expect a sum of products or a single product as input but got {expression}"
+        )
         slack_count = 0
-        
+
         while True:
-            problematic_terms = self.__get_problematic_terms(expression.args) if isinstance(expression, sp.Add) else self.__get_problematic_terms([expression])
-            
+            problematic_terms = (
+                self.__get_problematic_terms(expression.args)
+                if isinstance(expression, sp.Add)  # type: ignore[attr-defined]
+                else self.__get_problematic_terms([expression])
+                if isinstance(expression, sp.Mul)
+                else None
+            )
+            if problematic_terms is None:
+                msg = f"Error reducing cost function order: Expected a sum of products or a single product but got {expression}"
+                raise TypeError(msg)
+
             if not problematic_terms:
                 return expression
-            
+
             counts: dict[tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function], int] = {}
             highest_key: tuple[sp.Symbol | sp.Function, sp.Symbol | sp.Function] | None = None
             for term in problematic_terms:
-                symbols = sorted(term.free_symbols, key=lambda s: str(s))
-                #print("Symbols:", symbols)
+                symbols = sorted(term.free_symbols, key=str)  # type: ignore[attr-defined]
                 for s1 in symbols:
                     for s2 in symbols:
                         if s1 == s2:
@@ -287,13 +357,16 @@ class QUBOGenerator:
                         if highest_key is None or counts[key] > counts[highest_key]:
                             highest_key = key
 
+            if highest_key is None:
+                msg = "Error reducing cost function order: No highest key found, but problematic terms still exist."
+                raise RuntimeError(msg)
             selected_variables = [highest_key[0], highest_key[1]]
-            #print("Selected:", selected_variables)
-            
+
             slack_count += 1
             y = sp.Symbol(f"y_{slack_count}")
-            expression = expression.subs({highest_key[0] * highest_key[1]: y}) + self.__get_slack_penalty(selected_variables[0], selected_variables[1], y)
-            #print("New Expression:", expression)
+            expression = expression.subs({highest_key[0] * highest_key[1]: y}) + self.__get_slack_penalty(
+                selected_variables[0], selected_variables[1], y
+            )
 
     def expand_higher_order_terms_no_embedding(self, expression: sp.Expr) -> sp.Expr:
         """Expands a mathematical QUBO expression.
@@ -399,7 +472,7 @@ class QUBOGenerator:
         """
         if isinstance(expression, sp.Mul):
             return sum(self.__get_order(arg) for arg in expression.args)
-        if isinstance(expression, sp.Symbol) or isinstance(expression, sp.Function):
+        if isinstance(expression, (sp.Symbol, sp.Function)):
             return 1
         return 0
 
@@ -458,9 +531,16 @@ class QUBOGenerator:
             npt.NDArray[np.int_ | np.float64]: The matrix representation of the QUBO problem.
         """
         if not for_embedding:
-            coefficients = dict(self.construct_expansion(for_embedding=for_embedding).expand().as_coefficients_dict())
+            expansion = self.construct_expansion(for_embedding=for_embedding)
+            if isinstance(expansion, tuple):
+                expansion = expansion[0]
+            coefficients = dict(expansion.expand().as_coefficients_dict())
             auxiliary_variables = list({var for arg in coefficients for var in self.__get_auxiliary_variables(arg)})
-            auxiliary_variables.sort(key=lambda var: tuple([0 if str(var).startswith("y") else 1] + [int(x) for x in str(var)[2:].replace("'", "").split("_")]))
+            auxiliary_variables.sort(
+                key=lambda var: tuple(
+                    [0 if str(var).startswith("y") else 1] + [int(x) for x in str(var)[2:].replace("'", "").split("_")]
+                )
+            )
             result = np.zeros((
                 self.get_encoding_variable_count() + len(auxiliary_variables),
                 self.get_encoding_variable_count() + len(auxiliary_variables),
@@ -472,31 +552,34 @@ class QUBOGenerator:
                 if variable in all_variables:
                     return all_variables[variable] - 1
                 return auxiliary_variables.index(cast("sp.Symbol", variable)) + self.get_encoding_variable_count()
+
         else:
-            expr, assignment = self.construct_expansion(include_slack_information=True, for_embedding=for_embedding)
+            expansion_result: tuple[sp.Expr, EmbeddedSlackChainAssignment] = self.construct_expansion(  # type: ignore[assignment]
+                include_slack_information=True, for_embedding=for_embedding
+            )
+            expr, assignment = expansion_result
             num_variables = len(assignment.indices)
             result = np.zeros((
                 num_variables,
                 num_variables,
             ))
             coefficients = dict(expr.as_coefficients_dict())
+
             def get_index(variable: sp.Expr) -> int:
                 return assignment.indices[str(variable)]
-        
+
         for term, value in coefficients.items():
-                if isinstance(term, sp.Mul):
-                    index1 = get_index(term.args[0])
-                    index2 = get_index(term.args[1])
-                    if index1 > index2:
-                        index1, index2 = index2, index1
-                    result[index1][index2] = value
-                elif isinstance(term, (sp.Symbol, sp.Function)):
-                    index = get_index(term)
-                    result[index][index] = value
+            if isinstance(term, sp.Mul):
+                index1 = get_index(term.args[0])
+                index2 = get_index(term.args[1])
+                if index1 > index2:
+                    index1, index2 = index2, index1
+                result[index1][index2] = value
+            elif isinstance(term, (sp.Symbol, sp.Function)):
+                index = get_index(term)
+                result[index][index] = value
 
         return result
-
-
 
     def get_cost(self, assignment: list[int]) -> float:
         """Given an assignment, computes the total cost value of the corresponding cost function evaluation.
@@ -514,7 +597,7 @@ class QUBOGenerator:
             msg = "Provided values are not binary (1/0)"
             raise ValueError(msg)
 
-        expansion = self.construct_expansion()
+        expansion: sp.Expr = self.construct_expansion()  # type: ignore[assignment]
         auxiliary_assignment: dict[sp.Expr, int] = {}
 
         if len(assignment) == self.get_encoding_variable_count():
@@ -572,12 +655,12 @@ class QUBOGenerator:
         Returns:
             list[tuple[sp.Expr, int]]: A list of tuples containing the variable and its index.
         """
-        all_expresions = [self.objective_function] + [penalty[0] for penalty in self.penalties]
+        all_expressions: list[sp.Expr] = [self.objective_function] + [penalty[0] for penalty in self.penalties]  # type: ignore[assignment]
         variables = set()
-        for expr in all_expresions:
-            variables |= expr.free_symbols
-        l = sorted(list(variables), key=lambda var: int(str(var)[2:]))
-        return [(var, i + 1) for i, var in enumerate(l)]
+        for expr in all_expressions:
+            variables |= expr.free_symbols  # type: ignore[attr-defined]
+        sorted_labels = sorted(variables, key=lambda var: int(str(var)[2:]))
+        return [(var, i + 1) for i, var in enumerate(sorted_labels)]
 
     def _select_lambdas(self) -> list[tuple[sp.Expr, float]]:
         """Computes the penalty factors for each constraint. May be extended by subclasses.
@@ -593,7 +676,8 @@ class QUBOGenerator:
         Returns:
             int: The number of required variables.
         """
-        coefficients = dict(self.construct_expansion().as_coefficients_dict())
+        expansion: sp.Expr = self.construct_expansion()  # type: ignore[assignment]
+        coefficients = dict(expansion.as_coefficients_dict())
         auxiliary_variables = list({var for arg in coefficients for var in self.__get_auxiliary_variables(arg)})
         return len(self._get_encoding_variables()) + len(auxiliary_variables)
 
@@ -609,7 +693,7 @@ class QUBOGenerator:
         """For a given variable, returns its index in the QUBO matrix.
 
         Args:
-            _variable (sp.Expr): The variable to investigate.
+            variable (sp.Expr): The variable to investigate.
 
         Returns:
             int: The index of the variable.
@@ -631,15 +715,22 @@ class QUBOGenerator:
         return ""
 
     def construct_qaoa_circuit(self, n_qubits: int = -1, do_reuse: bool = True) -> qiskit.QuantumCircuit:
+        """Constructs a QAOA circuit for the QUBO problem.
+
+        Args:
+            n_qubits (int, optional): If given, sets the number of qubits for the full circuit.
+            do_reuse (bool, optional): Attempt to reuse qubits to limit the number of variables. Defaults to True.
+
+        Returns:
+            qiskit.QuantumCircuit: The constructed QAOA circuit.
+        """
         include_barriers = False
 
         interactions = self.construct_interaction_graph(for_embedding=False)
-        qubits = max(max(i, j) for i, j in interactions) + 1
+        qubits = max(starmap(max, interactions)) + 1
         circuit = qiskit.QuantumCircuit(n_qubits if n_qubits != -1 else qubits, qubits)
         gamma = qiskit.circuit.Parameter("gamma")
         beta = qiskit.circuit.Parameter("beta")
-        
-        
 
         if not do_reuse:
             for i in range(qubits):
@@ -662,7 +753,7 @@ class QUBOGenerator:
             used_qubits = set()
             free_qubits = list(range(qubits))
             substitution: dict[int, int] = {}
-            outgoing = {i: set() for i in range(qubits)}
+            outgoing: dict[int, set[int]] = {i: set() for i in range(qubits)}
             for i, j in interactions:
                 outgoing[i].add(j)
                 outgoing[j].add(i)
@@ -672,7 +763,7 @@ class QUBOGenerator:
                 circuit.h(substitution[qubit])
                 used_qubits.add(substitution[qubit])
 
-            total_outgoing = set()
+            total_outgoing: set[int] = set()
             remaining = list(range(qubits))
             covered = set()
             while remaining:
@@ -701,7 +792,7 @@ class QUBOGenerator:
         if do_reuse and len(used_qubits) < len(circuit.qubits):
             return self.construct_qaoa_circuit(n_qubits=len(used_qubits))
         return circuit
-    
+
     def construct_interaction_graph(self, offset: int = 0, for_embedding: bool = False) -> list[tuple[int, int]]:
         """Constructs the interaction graph of the QUBO problem.
 
@@ -712,18 +803,33 @@ class QUBOGenerator:
         return [(i + offset, j + offset) for i in range(len(qubo)) for j in range(i + 1, len(qubo)) if qubo[i][j] != 0]
 
     def construct_embedded_qaoa_circuit(self, device: Calibration) -> qiskit.QuantumCircuit:
-        expression, assignment = self.construct_expansion(include_slack_information=True, for_embedding=True)
+        """Constructs a QAOA circuit for the QUBO problem that is embedded on the given device.
+
+        Args:
+            device (Calibration): The device to embed the QAOA circuit on.
+
+        Returns:
+            qiskit.QuantumCircuit: The constructed QAOA circuit.
+        """
+        expansion: tuple[sp.Expr, EmbeddedSlackChainAssignment] = self.construct_expansion(
+            include_slack_information=True, for_embedding=True
+        )  # type: ignore[assignment]
+        expression, assignment = expansion
         coefficients = dict(expression.as_coefficients_dict())
         auxiliary_variables = list({var for arg in coefficients for var in self.__get_auxiliary_variables(arg)})
-        auxiliary_variables.sort(key=lambda var: tuple([0 if str(var).startswith("y") else 1] + [int(x) for x in str(var)[2:].replace("'", "").split("_")]))
+        auxiliary_variables.sort(
+            key=lambda var: tuple(
+                [0 if str(var).startswith("y") else 1] + [int(x) for x in str(var)[2:].replace("'", "").split("_")]
+            )
+        )
 
         variable_indices = assignment.indices
         slack_dict = assignment.slack_dict
-        indices_to_variables = {i: v for v, i in variable_indices.items()}                
-        
+        indices_to_variables = {i: v for v, i in variable_indices.items()}
+
         chains = assignment.chains
         interactions = self.construct_interaction_graph(offset=0, for_embedding=True)
-        covered_interactions: set[tuple[int, int]]= set()
+        covered_interactions: set[tuple[int, int]] = set()
 
         substitution: dict[str, int] = {}
         full_nn_chain: list[int] = device.get_connected_qubit_chain()
@@ -735,7 +841,13 @@ class QUBOGenerator:
 
         def add_rzz(q1: str, q2: str) -> None:
             nonlocal qc, gamma, substitution
-            qc.rzz(gamma, substitution[q1], substitution[q2])
+            angle = float(coefficients[sp.Symbol(q1) * sp.Symbol(q2)])
+            qc.rzz(gamma * 2 * angle, substitution[q1], substitution[q2])
+
+        def add_rz(q: str, angle: float) -> None:
+            nonlocal qc, gamma, substitution
+            qc.rz(gamma * 2 * angle, substitution[q])
+
         def add_swap(q1: str, q2: str, decomposed: bool) -> None:
             nonlocal qc, gamma, substitution
             if decomposed:
@@ -750,15 +862,13 @@ class QUBOGenerator:
                 qc.cz(substitution[q1], substitution[q2])
             else:
                 qc.swap(substitution[q1], substitution[q2])
+
         def get_next_substitution(q: str) -> int:
-            nonlocal substitution
-            nonlocal nn_qubit_queue
+            nonlocal substitution, nn_qubit_queue
             if q in substitution:
-                #print(f"Variable {q} already substituted, using {substitution[q]}")
                 return substitution[q]
             substitution[q] = nn_qubit_queue.pop(0)
             return substitution[q]
-
 
         chain_groups: list[list[tuple[str, str]]] = []
         for chain in chains:
@@ -766,7 +876,9 @@ class QUBOGenerator:
             first_pair = slack_dict[first_var]
             get_next_substitution(first_pair[0])
             get_next_substitution(first_pair[1])
-            groups: list[tuple[str, str]] = [] # A group always consists of a slack var and its subsequent encoding var, or the first two encoding variables
+            groups: list[
+                tuple[str, str]
+            ] = []  # A group always consists of a slack var and its subsequent encoding var, or the first two encoding variables
             groups.append(first_pair)
             for slack in chain[1:]:
                 predecessors = slack_dict[slack]
@@ -778,9 +890,6 @@ class QUBOGenerator:
             substitution[chain[-1]] = nn_qubit_queue.pop(0)
             groups.append((chain[-1], ""))
             chain_groups.append(groups)
-        
-        #for i in range(qc.num_qubits):
-        #    qc.h(i)
 
         for groups in chain_groups:
             for group in groups:
@@ -792,8 +901,11 @@ class QUBOGenerator:
             for g1, g2 in zip(groups[:-1], groups[1:]):
                 add_rzz(g1[1], g2[0])
                 covered_interactions.add((variable_indices[g1[1]], variable_indices[g2[0]]))
-                covered_interactions.add((variable_indices[g1[0]], variable_indices[g2[0]])) # will be added in for loop below but needs to be done now already for next step
-            
+                covered_interactions.add((
+                    variable_indices[g1[0]],
+                    variable_indices[g2[0]],
+                ))  # will be added in for loop below but needs to be done now already for next step
+
         for i, j in interactions:
             if (i, j) in covered_interactions or (j, i) in covered_interactions:
                 continue
@@ -805,121 +917,33 @@ class QUBOGenerator:
                 substitution[v_j] = nn_qubit_queue.pop(0)
             add_rzz(v_i, v_j)
 
+        incomplete_swaps = {}
         for groups in chain_groups:
             for g1, g2 in zip(groups[::2], groups[1::2]):
                 add_swap(g1[0], g1[1], False)
                 add_rzz(g1[1], g2[0])
                 add_swap(g1[0], g1[1], False)
             for g1, g2 in zip(groups[1::2], groups[2::2]):
+                incomplete_swaps[g1[0]] = g1[1]
+                incomplete_swaps[g1[1]] = g1[0]
                 add_swap(g1[0], g1[1], False)
                 add_rzz(g1[1], g2[0])
-            
-            #for g1, g2 in zip(groups[:-1], groups[1:]):
-            #    add_swap(g1[0], g1[1])
-            #    add_rzz(g1[1], g2[0])
 
+        for q in expression.free_symbols:  # type: ignore[attr-defined]
+            total_angle = coefficients.get(q, 0) * 2
+            for q_2 in expression.free_symbols:  # type: ignore[attr-defined]
+                if q_2 == q:
+                    continue
+                total_angle += coefficients.get(q * q_2, 0)
+            if total_angle != 0:
+                add_rz(str(q), -float(total_angle))
         qc_front = qiskit.QuantumCircuit(device.num_qubits, device.num_qubits)
         for i in range(len(full_nn_chain) - len(nn_qubit_queue)):
             q = full_nn_chain[i]
-            
+
             qc_front.h(q)
-            qc.rx(beta, q)
-            qc.measure(q, q)
-        qc = qc_front.compose(qc, front=False)
-
-        return qc
-
-
-
-
-
-
-    def construct_embedded_qaoa_circuit_old(self, device: Calibration) -> qiskit.QuantumCircuit:
-        interactions = self.construct_interaction_graph(offset=1)
-
-        num_encoding_variables = self.get_encoding_variable_count()
-        num_variables = max(max(i, j) for (i, j) in interactions)
-
-        # The heavy chain gives a sequence of heavy nodes in the heavyhex topology that can be
-        # consumed to find the next physical qubit to use for junctions in the QUBO.
-        heavy_chain = device.get_heavy_chain()
-
-        substitution: dict[int, int] = {}
-
-        # The first two variables need special treatment as they are the only encoding variables
-        # that are directly connected (without a slack junction).
-        next_heavy_node = heavy_chain.pop(0)
-        connected_encoding_variables = [(i, j) for i, j in interactions if i <= num_encoding_variables and j <= num_encoding_variables]
-        assert len(connected_encoding_variables) == 1
-        x1, x2 = connected_encoding_variables[0]
-        substitution[x1] = next_heavy_node
-        substitution[x2] = [x for x in device.heavy[next_heavy_node] if x in device.heavy[heavy_chain[0]]][0]
-        next_heavy_node = heavy_chain.pop(0)
-
-        # The remaining variables are connected through slack junctions.
-        slack_interactions = {}
-        for (i, j) in interactions:
-            if i > num_encoding_variables:
-                if i not in slack_interactions:
-                    slack_interactions[i] = []
-                slack_interactions[i].append(j)
-            if j > num_encoding_variables:
-                if j not in slack_interactions:
-                    slack_interactions[j] = []
-                slack_interactions[j].append(i)
-                
-        current_slack = num_encoding_variables + 1
-        while current_slack < num_variables:
-            substitution[current_slack] = next_heavy_node
-            next_slack_variable = [x for x in slack_interactions[current_slack] if x > num_encoding_variables and x > current_slack][0] # always exactly one, only current_slack == num_variables has 0
-            related_encoding_variable = [x for x in slack_interactions[current_slack] if x <= num_encoding_variables and x not in substitution][0]
-            substitution[related_encoding_variable] = [x for x in device.heavy[next_heavy_node] if x in device.heavy[heavy_chain[0]]][0]
-            next_heavy_node = heavy_chain.pop(0)
-            current_slack = next_slack_variable
-        substitution[current_slack] = next_heavy_node
-        for remaining in slack_interactions[current_slack]:
-            if remaining not in substitution:
-                for neighbor in device.heavy[next_heavy_node]:
-                    if neighbor not in substitution.values():
-                        substitution[remaining] = neighbor
-                        break
-        
-        # From the generated interactions and substitution, we can now construct the QAOA circuit.
-        gamma = qiskit.circuit.Parameter("gamma")
-        beta = qiskit.circuit.Parameter("beta")
-        qc = qiskit.QuantumCircuit(device.num_qubits, num_variables)
-
-        for i in range(1, num_variables + 1):
-            qc.h(substitution[i])
-
-        for i, j in interactions:
-            mapped_i = substitution[i]
-            mapped_j = substitution[j]
-            if (mapped_i, mapped_j) in device.two_qubit:
-                qc.rzz(gamma, mapped_i, mapped_j)
-            elif (mapped_j, mapped_i) in device.two_qubit:
-                qc.rzz(gamma, mapped_j, mapped_i)
-            else:
-                shared_neighbor = device.get_shared_neighbor(mapped_i, mapped_j)
-                assert shared_neighbor != -1
-                if (mapped_i, shared_neighbor) in device.two_qubit:
-                    qc.swap(mapped_i, shared_neighbor)
-                else:
-                    qc.swap(shared_neighbor, mapped_i)
-                if (shared_neighbor, mapped_j) in device.two_qubit:
-                    qc.rzz(gamma, shared_neighbor, mapped_j)
-                else:
-                    qc.rzz(gamma, mapped_j, shared_neighbor)
-                if (mapped_i, shared_neighbor) in device.two_qubit:
-                    qc.swap(mapped_i, shared_neighbor)
-                else:
-                    qc.swap(shared_neighbor, mapped_i)
-
-        for i in range(1, num_variables + 1):
-            qc.rx(beta, substitution[i])
-
-        for i in range(1, num_variables + 1):
-            qc.measure(substitution[i], i - 1)
-
-        return qc
-
+            qc.rx(2 * beta, q)
+        for name, idx in substitution.items():
+            measure_index = substitution[incomplete_swaps[name]] if name in incomplete_swaps else idx
+            qc.measure(measure_index, assignment.indices[name])
+        return qc_front.compose(qc, front=False)
