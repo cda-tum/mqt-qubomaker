@@ -83,7 +83,7 @@ def test_tsp(encoding_type: pf.EncodingType) -> None:
         assert generator.get_cost(optimal_solution) == 20.0
 
         # Test if constructing the Quantum Circuit works without a problem.
-        generator.construct_qaoa(seed=0)
+        generator.construct_qaoa_circuit()
 
     solution = paths_to_assignment_list([[4, 1, 2, 3]], 4, 4, encoding_type)
     assert generator.get_cost(solution) == 20.0

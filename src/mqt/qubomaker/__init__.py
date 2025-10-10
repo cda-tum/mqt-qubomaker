@@ -10,16 +10,16 @@ When done, the object can be used to construct a QUBO formulation of the project
 from __future__ import annotations
 
 from . import pathfinder
+from .device import Calibration
 from .graph import Graph
 from .qubo_generator import QUBOGenerator
 from .utils import optimize_classically, print_matrix
-from .device import Calibration
 
 __all__ = [
+    "Calibration",
     "Graph",
     "QUBOGenerator",
     "optimize_classically",
     "pathfinder",
     "print_matrix",
-    "Calibration",
 ]
