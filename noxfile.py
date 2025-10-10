@@ -27,8 +27,6 @@ nox.options.default_venv_backend = "uv"
 
 nox.options.sessions = ["lint", "tests", "minimums"]
 
-# TODO(denialhaag): Add 3.14 when all dependencies support it
-#   https://github.com/munich-quantum-toolkit/debugger/issues/101
 PYTHON_ALL_VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
 
 if os.environ.get("CI", None):
@@ -86,7 +84,7 @@ def _run_tests(
         "--inexact",
         "--no-dev",  # do not auto-install dev dependencies
         "--no-build-isolation-package",
-        "mqt-debugger",  # build the project without isolation
+        "mqt-qubomaker",  # build the project without isolation
         "--extra",
         "check",
         *install_args,
@@ -179,7 +177,7 @@ def docs(session: nox.Session) -> None:
         "run",
         "--no-dev",  # do not auto-install dev dependencies
         "--no-build-isolation-package",
-        "mqt-debugger",  # build the project without isolation
+        "mqt-qubomaker",  # build the project without isolation
         "sphinx-autobuild" if serve else "sphinx-build",
         *shared_args,
         env=env,
