@@ -52,16 +52,20 @@ def evaluate(
         for i in range(TEST_GRAPH.n_vertices)
         for j in range(TEST_GRAPH.n_vertices)
     ]
+    assignment_dict = dict(assignment)
+    # Substitute in initial assignment info needed e.g. for loop bounds.
+    formula = formula.subs(assignment_dict)
+    # Unroll loops.
+    formula = formula.doit()
+    # Second call required to fully unroll all loops.
+    formula = formula.doit()
+    # Substitute in remaining path assignment that only became available.
+    # after loops
+    formula = formula.subs(assignment_dict)
+    # Substitute in path assignment.
+    formula = formula.subs(path)
     return int(
-        formula.subs(path)
-        .doit()
-        .subs(path)
-        .doit()
-        .subs(dict(assignment))
-        .doit()
-        .subs(path)
-        .subs(dict(assignment))
-        .subs(path),
+        formula,
     )
 
 
