@@ -64,6 +64,23 @@ def get_test_graph_small() -> Graph:
     )
 
 
+def get_test_graph_tiny() -> Graph:
+    """Generate a |V| = 3 graph for testing.
+
+    Returns:
+        Graph: The generated graph.
+    """
+    return Graph(
+        3,
+        [
+            (1, 2, 8),
+            (1, 3, 4),
+            (2, 1, 2),
+            (3, 2, 3),
+        ],
+    )
+
+
 def paths_equal_with_loops(a: list[int], b: list[int]) -> bool:
     """Check if two paths are equal, in the presence of loops.
 
