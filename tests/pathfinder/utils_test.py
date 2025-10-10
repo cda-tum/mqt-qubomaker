@@ -191,12 +191,12 @@ def __paths_to_assignment_binary(paths: list[list[int]], n_vertices: int, max_pa
     return dict(result)
 
 
-def check_equal(a: pf.PathFindingQUBOGenerator, b: pf.PathFindingQUBOGenerator) -> None:
-    """Check if two PathFindingQUBOGenerators are equal.
+def check_equal(a: pf.PathFindingQuboGenerator, b: pf.PathFindingQuboGenerator) -> None:
+    """Check if two PathFindingQuboGenerators are equal.
 
     Args:
-        a (pf.PathFindingQUBOGenerator): The first generator to be compared.
-        b (pf.PathFindingQUBOGenerator): The second generator to be compared.
+        a (pf.PathFindingQuboGenerator): The first generator to be compared.
+        b (pf.PathFindingQuboGenerator): The second generator to be compared.
     """
     assert a.objective_function == b.objective_function
     assert a.graph == b.graph

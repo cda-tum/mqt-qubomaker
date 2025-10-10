@@ -68,7 +68,7 @@ class SlackChainAssignment:
             self.indices[prime] = len(self.indices)
 
 
-class QUBOGenerator:
+class QuboGenerator:
     """A base class for QUBO generators that can be extended for different problem classes.
 
     Collects constraints and penalties and provides methods for constructing the QUBO representation of a problem.
@@ -93,7 +93,7 @@ class QUBOGenerator:
     )
 
     def __init__(self, objective_function: sp.Expr | None) -> None:
-        """Initializes a new QUBOGenerator instance.
+        """Initializes a new QuboGenerator instance.
 
         Args:
             objective_function (sp.Expr | None): The objective function to be used by the QUBO generator.
@@ -235,7 +235,7 @@ class QUBOGenerator:
 
         y = sp.Symbol(f"y_{chain_index}_1")
         assignment.add_slack_variable(str(y), str(selected_variables[0]), str(selected_variables[1]))
-        new_expr = expression.subs({highest_key[0] * highest_key[1]: y}) + QUBOGenerator.__get_slack_penalty(
+        new_expr = expression.subs({highest_key[0] * highest_key[1]: y}) + QuboGenerator.__get_slack_penalty(
             selected_variables[0], selected_variables[1], y
         )
         new_expr += equality_penalty
@@ -475,7 +475,7 @@ class QUBOGenerator:
         return []
 
     def _construct_expansion(self, expression: sp.Expr) -> sp.Expr:  # noqa: PLR6301
-        """A method that can be extended by classes that inherit from QUBOGenerator to transform the QUBO formulation into expanded form, if that process requires additional steps.
+        """A method that can be extended by classes that inherit from QuboGenerator to transform the QUBO formulation into expanded form, if that process requires additional steps.
 
         Args:
             expression (sp.Expr): The expression to transform.

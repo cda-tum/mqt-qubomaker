@@ -1,4 +1,4 @@
-"""Includes all cost functions supported by the pathfinding QUBOGenerator."""
+"""Includes all cost functions supported by the pathfinding QuboGenerator."""
 
 from __future__ import annotations
 
@@ -475,12 +475,12 @@ class CostFunction(ABC):
     Represents a cost function that can be translated into a QUBO expression.
     """
 
-    def get_formula(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         """Translates the cost function into a QUBO expression.
 
         Args:
             graph (Graph): The graph on which the cost function should be applied.
-            settings (pathfinder.PathFindingQUBOGeneratorSettings): The settings of the QUBO generator.
+            settings (pathfinder.PathFindingQuboGeneratorSettings): The settings of the QUBO generator.
 
         Returns:
             sp.Expr: An expression representing the cost function as a QUBO function.
@@ -497,7 +497,7 @@ class CostFunction(ABC):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         """Returns the QUBO expression for the cost function in the general case.
@@ -507,43 +507,43 @@ class CostFunction(ABC):
 
         Args:
             graph (Graph): The graph on which the cost function should be applied.
-            settings (pathfinder.PathFindingQUBOGeneratorSettings): The settings of the QUBO generator.
+            settings (pathfinder.PathFindingQuboGeneratorSettings): The settings of the QUBO generator.
             get_variable_function (GetVariableFunction): The blackbox function for accessing the encoding variables.
 
         Returns:
             sp.Expr: An expression representing the cost function as a QUBO function.
         """
 
-    def get_formula_one_hot(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_one_hot(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         """Computes the QUBO expression for the cost function for One-Hot encoding.
 
         Args:
             graph (Graph): The graph on which the cost function should be applied.
-            settings (pathfinder.PathFindingQUBOGeneratorSettings): The settings of the QUBO generator.
+            settings (pathfinder.PathFindingQuboGeneratorSettings): The settings of the QUBO generator.
 
         Returns:
             sp.Expr: An expression representing the cost function as a QUBO function.
         """
         return self.get_formula_general(graph, settings, FormulaHelpers.get_encoding_variable_one_hot)
 
-    def get_formula_domain_wall(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_domain_wall(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         """Computes the QUBO expression for the cost function for Domain-Wall encoding.
 
         Args:
             graph (Graph): The graph on which the cost function should be applied.
-            settings (pathfinder.PathFindingQUBOGeneratorSettings): The settings of the QUBO generator.
+            settings (pathfinder.PathFindingQuboGeneratorSettings): The settings of the QUBO generator.
 
         Returns:
             sp.Expr: An expression representing the cost function as a QUBO function.
         """
         return self.get_formula_general(graph, settings, FormulaHelpers.get_encoding_variable_domain_wall)
 
-    def get_formula_binary(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_binary(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         """Computes the QUBO expression for the cost function for Binary encoding.
 
         Args:
             graph (Graph): The graph on which the cost function should be applied.
-            settings (pathfinder.PathFindingQUBOGeneratorSettings): The settings of the QUBO generator.
+            settings (pathfinder.PathFindingQuboGeneratorSettings): The settings of the QUBO generator.
 
         Returns:
             sp.Expr: An expression representing the cost function as a QUBO function.
@@ -585,7 +585,7 @@ class CompositeCostFunction(CostFunction):
         return "   " + "\n + ".join([f"{w} * {fn}" for (fn, w) in self.summands])
 
     @override
-    def get_formula(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         return functools.reduce(
             lambda a, b: a + b[1] * b[0].get_formula(graph, settings),
             self.summands[1:],
@@ -596,7 +596,7 @@ class CompositeCostFunction(CostFunction):
     def get_formula_general(
         self,
         _graph: Graph,
-        _settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        _settings: pathfinder.PathFindingQuboGeneratorSettings,
         _get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         msg = "This method should not be called for a composite cost function."
@@ -632,7 +632,7 @@ class PathPositionIs(CostFunction):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return (
@@ -705,7 +705,7 @@ class PathEndsAt(CostFunction):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.sum_from_to(
@@ -823,7 +823,7 @@ class PathContainsVerticesExactlyOnce(PathContainsVertices):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -853,7 +853,7 @@ class PathContainsVerticesAtLeastOnce(PathContainsVertices):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -879,7 +879,7 @@ class PathContainsVerticesAtMostOnce(PathContainsVertices):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -978,7 +978,7 @@ class PathContainsEdgesExactlyOnce(PathContainsEdges):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -1012,7 +1012,7 @@ class PathContainsEdgesAtLeastOnce(PathContainsEdges):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -1045,7 +1045,7 @@ class PathContainsEdgesAtMostOnce(PathContainsEdges):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return self._handle_for_each(
@@ -1121,7 +1121,7 @@ class PrecedenceConstraint(PathBound):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.get_for_each_path(
@@ -1178,7 +1178,7 @@ class PathsShareNoVertices(PathComparison):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.get_for_each_vertex(
@@ -1199,7 +1199,7 @@ class PathsShareNoEdges(PathComparison):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.sum_set(
@@ -1249,7 +1249,7 @@ class PathIsValid(PathBound):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.get_for_each_path(
@@ -1269,7 +1269,7 @@ class PathIsValid(PathBound):
         )
 
     @override
-    def get_formula_one_hot(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_one_hot(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         def get_variable_function(p: Any, v: Any, i: Any, _n: int = 0) -> sp.Expr:
             return FormulaHelpers.get_encoding_variable_one_hot(p, v, i)
 
@@ -1285,7 +1285,7 @@ class PathIsValid(PathBound):
         )
 
     @override
-    def get_formula_domain_wall(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_domain_wall(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         general = self.get_formula_general(graph, settings, FormulaHelpers.get_encoding_variable_domain_wall)
         enforce_domain_wall_penalty: sp.Expr = (
             2 * settings.max_path_length * np.max(graph.adjacency_matrix) + graph.n_vertices**2
@@ -1306,7 +1306,7 @@ class PathIsValid(PathBound):
         )
 
     @override
-    def get_formula_binary(self, graph: Graph, settings: pathfinder.PathFindingQUBOGeneratorSettings) -> sp.Expr:
+    def get_formula_binary(self, graph: Graph, settings: pathfinder.PathFindingQuboGeneratorSettings) -> sp.Expr:
         return self.get_formula_general(graph, settings, FormulaHelpers.get_encoding_variable_binary)
 
 
@@ -1328,7 +1328,7 @@ class MinimizePathLength(PathBound):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return FormulaHelpers.get_for_each_path(
@@ -1367,7 +1367,7 @@ class MaximizePathLength(PathBound):
     def get_formula_general(
         self,
         graph: Graph,
-        settings: pathfinder.PathFindingQUBOGeneratorSettings,
+        settings: pathfinder.PathFindingQuboGeneratorSettings,
         get_variable_function: GetVariableFunction,
     ) -> sp.Expr:
         return -1 * FormulaHelpers.get_for_each_path(

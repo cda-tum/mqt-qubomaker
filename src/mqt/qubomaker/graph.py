@@ -1,4 +1,4 @@
-"""Provides a simple implementation for graphs to be used with QUBOMaker."""
+"""Provides a simple implementation for graphs to be used with QuboMaker."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class Graph:
-    """Represents a graph to be used with QUBOMaker.
+    """Represents a graph to be used with QuboMaker.
 
     Attributes:
         n_vertices (int): The number of vertices in the graph.

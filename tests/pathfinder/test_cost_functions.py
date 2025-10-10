@@ -28,7 +28,7 @@ def evaluate(
     Returns:
         int: The cost of the assignment for the given cost function.
     """
-    settings = pf.PathFindingQUBOGeneratorSettings(encoding, n_paths, TEST_GRAPH.n_vertices, loop)
+    settings = pf.PathFindingQuboGeneratorSettings(encoding, n_paths, TEST_GRAPH.n_vertices, loop)
     formula = cost_function.get_formula(TEST_GRAPH, settings)
     assignment: list[tuple[sp.Expr, sp.Expr | int | float]] = [
         (cf.FormulaHelpers.get_encoding_variable_one_hot(p + 1, TEST_GRAPH.n_vertices + 1, i + 1), 0)
@@ -501,7 +501,7 @@ def test_latex_output() -> None:
 
 def test_composite_get_formula() -> None:
     """Test for the correctness of the CompositeCostFunction get_formula method."""
-    settings = pf.PathFindingQUBOGeneratorSettings(cf.EncodingType.ONE_HOT, 1, TEST_GRAPH.n_vertices, False)
+    settings = pf.PathFindingQuboGeneratorSettings(cf.EncodingType.ONE_HOT, 1, TEST_GRAPH.n_vertices, False)
     p1 = cf.PathPositionIs(1, [1], 1)
     p2 = cf.PathPositionIs(2, [2], 1)
     c = cf.CompositeCostFunction((p1, 1), (p2, 1))
