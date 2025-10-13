@@ -14,6 +14,7 @@ import argparse
 import contextlib
 import os
 import shutil
+import sys
 import tempfile
 from typing import TYPE_CHECKING
 
@@ -78,6 +79,11 @@ def _run_tests(
         *install_args,
         env=env,
     )
+    if sys.version_info >= (3, 13):
+        add_tsplib = []
+    else:
+        add_tsplib = ["--extra", "tsplib"]
+
     session.run(
         "uv",
         "sync",
@@ -87,6 +93,7 @@ def _run_tests(
         "mqt-qubomaker",  # build the project without isolation
         "--extra",
         "check",
+        *add_tsplib,
         *install_args,
         env=env,
     )

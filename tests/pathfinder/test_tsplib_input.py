@@ -2,9 +2,14 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pytest
+
+if sys.version_info >= (3, 13):
+    pytest.skip("This module requires Python 3.12 or lower", allow_module_level=True)
+
 import tsplib95
 
 import mqt.qubomaker.pathfinder as pf

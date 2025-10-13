@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import mqt.qubomaker
@@ -9,8 +10,12 @@ import mqt.qubomaker.pathfinder
 from mqt.qubomaker.pathfinder import cost_functions
 
 if TYPE_CHECKING:
+    import contextlib
+
     import networkx as nx
-    from tsplib95.models import StandardProblem
+
+    with contextlib.suppress(ImportError):
+        from tsplib95.models import StandardProblem
 
 
 def __check_forced_edges(problem: StandardProblem) -> cost_functions.CostFunction | None:
@@ -127,6 +132,12 @@ def from_tsplib_problem(
     Returns:
         PathFindingQuboGenerator: The constructed QUBO generator.
     """
+    try:
+        importlib.util.find_spec("tsplib95")
+    except ImportError:
+        msg = "The 'tsplib95' package is required to use this function."
+        raise RuntimeError(msg) from None
+
     if problem.type in {"TSP", "ATSP"}:
         return __tsp(problem, encoding_type)
     if problem.type == "HCP":
