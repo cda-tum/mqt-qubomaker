@@ -78,7 +78,8 @@ def _run_tests(
         *install_args,
         env=env,
     )
-    add_tsplib = [] if session.python != "3.13" else ["--extra", "tsplib"]
+    print(session.python)
+    add_tsplib = [] if session.python == "3.13" else ["--extra", "tsplib"]
 
     session.run(
         "uv",
