@@ -14,7 +14,6 @@ import argparse
 import contextlib
 import os
 import shutil
-import sys
 import tempfile
 from typing import TYPE_CHECKING
 
@@ -79,10 +78,7 @@ def _run_tests(
         *install_args,
         env=env,
     )
-    if sys.version_info >= (3, 13):
-        add_tsplib = []
-    else:
-        add_tsplib = ["--extra", "tsplib"]
+    add_tsplib = [] if session.python != "3.13" else ["--extra", "tsplib"]
 
     session.run(
         "uv",
