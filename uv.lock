@@ -1403,14 +1403,16 @@ dependencies = [
     { name = "matplotlib" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
     { name = "numpy", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
-    { name = "qiskit" },
+    { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'" },
+    { name = "qiskit", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'" },
     { name = "sympy" },
     { name = "typing-extensions" },
 ]
 
 [package.optional-dependencies]
 check = [
-    { name = "qiskit" },
+    { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "qiskit", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "scipy", version = "1.16.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
 ]
@@ -1466,7 +1468,8 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
-    { name = "qiskit", extra = ["qasm3-import", "visualization"] },
+    { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'" },
+    { name = "qiskit", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'" },
     { name = "scikit-build-core" },
     { name = "setuptools-scm" },
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -1484,7 +1487,8 @@ docs = [
     { name = "graphviz" },
     { name = "myst-nb" },
     { name = "openqasm-pygments" },
-    { name = "qiskit", extra = ["qasm3-import", "visualization"] },
+    { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'" },
+    { name = "qiskit", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'" },
     { name = "setuptools-scm" },
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1524,8 +1528,9 @@ requires-dist = [
     { name = "pandas", extras = ["output-formatting"], marker = "python_full_version < '3.13' and extra == 'tsplib'", specifier = "==2.1.2" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.2" },
     { name = "pytest-cov", marker = "extra == 'coverage'", specifier = ">=4" },
-    { name = "qiskit", specifier = ">=1.0.0,<2.0.0" },
     { name = "qiskit", marker = "extra == 'check'", specifier = ">=1.2.4" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'", specifier = ">=1.0.0" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'", specifier = ">=2.0.0" },
     { name = "scipy", marker = "python_full_version >= '3.13' and extra == 'check'", specifier = ">=1.15" },
     { name = "scipy", marker = "python_full_version < '3.13' and extra == 'check'", specifier = ">=1.13.1" },
     { name = "setuptools-scm", marker = "extra == 'docs'", specifier = ">=8.1" },
@@ -1537,7 +1542,7 @@ requires-dist = [
     { name = "sphinxext-opengraph", marker = "extra == 'docs'", specifier = ">=0.9" },
     { name = "sympy", specifier = ">=1.13.1" },
     { name = "tsplib95", marker = "python_full_version < '3.13' and extra == 'tsplib'", specifier = ">=0.7.1" },
-    { name = "typing-extensions", specifier = ">=4.8.0" },
+    { name = "typing-extensions", specifier = ">=4.9.0" },
 ]
 provides-extras = ["test", "coverage", "docs", "dev", "check", "tsplib"]
 
@@ -1559,7 +1564,8 @@ dev = [
     { name = "pytest-cov", specifier = ">=6.1.1" },
     { name = "pytest-sugar", specifier = ">=1.0.0" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
-    { name = "qiskit", extras = ["qasm3-import", "visualization"], specifier = ">=1.0.0" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'", specifier = ">=1.0.0" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'", specifier = ">=2.0.0" },
     { name = "scikit-build-core", specifier = ">=0.11.1" },
     { name = "setuptools-scm", specifier = ">=8.2" },
     { name = "sphinx", specifier = ">=8.1.3" },
@@ -1577,7 +1583,8 @@ docs = [
     { name = "graphviz", specifier = ">=0.20.3" },
     { name = "myst-nb", specifier = ">=1.2.0" },
     { name = "openqasm-pygments", specifier = ">=0.1.2" },
-    { name = "qiskit", extras = ["qasm3-import", "visualization"], specifier = ">=1.0.0" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'", specifier = ">=1.0.0" },
+    { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version >= '3.13'", specifier = ">=2.0.0" },
     { name = "setuptools-scm", specifier = ">=8.2" },
     { name = "sphinx", specifier = ">=8.1.3" },
     { name = "sphinx", marker = "python_full_version >= '3.11'", specifier = ">=8.2.3" },
@@ -2478,18 +2485,22 @@ wheels = [
 name = "qiskit"
 version = "1.4.4"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.12.*'",
+    "python_full_version == '3.11.*'",
+    "python_full_version < '3.11'",
+]
 dependencies = [
-    { name = "dill" },
+    { name = "dill", marker = "python_full_version < '3.13'" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
-    { name = "numpy", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
-    { name = "python-dateutil" },
-    { name = "rustworkx" },
+    { name = "python-dateutil", marker = "python_full_version < '3.13'" },
+    { name = "rustworkx", marker = "python_full_version < '3.13'" },
     { name = "scipy", version = "1.15.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
-    { name = "scipy", version = "1.16.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
-    { name = "stevedore" },
-    { name = "symengine" },
-    { name = "sympy" },
-    { name = "typing-extensions" },
+    { name = "scipy", version = "1.16.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' and python_full_version < '3.13'" },
+    { name = "stevedore", marker = "python_full_version < '3.13'" },
+    { name = "symengine", marker = "python_full_version < '3.13'" },
+    { name = "sympy", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/25/26/f1651c9b8f8432720af7e53cc6454c31a202286741ca989ba9160e87f30f/qiskit-1.4.4.tar.gz", hash = "sha256:96251c94b14175455809016c08c013dfb615020289e2920a9878fddf35bdda86", size = 3941101, upload-time = "2025-08-15T18:02:42.28Z" }
 wheels = [
@@ -2506,14 +2517,53 @@ wheels = [
 
 [package.optional-dependencies]
 qasm3-import = [
-    { name = "qiskit-qasm3-import" },
+    { name = "qiskit-qasm3-import", marker = "python_full_version < '3.13'" },
 ]
 visualization = [
-    { name = "matplotlib" },
-    { name = "pillow" },
-    { name = "pydot" },
-    { name = "pylatexenc" },
-    { name = "seaborn" },
+    { name = "matplotlib", marker = "python_full_version < '3.13'" },
+    { name = "pillow", marker = "python_full_version < '3.13'" },
+    { name = "pydot", marker = "python_full_version < '3.13'" },
+    { name = "pylatexenc", marker = "python_full_version < '3.13'" },
+    { name = "seaborn", marker = "python_full_version < '3.13'" },
+]
+
+[[package]]
+name = "qiskit"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13'",
+]
+dependencies = [
+    { name = "dill", marker = "python_full_version >= '3.13'" },
+    { name = "numpy", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
+    { name = "rustworkx", marker = "python_full_version >= '3.13'" },
+    { name = "scipy", version = "1.16.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
+    { name = "stevedore", marker = "python_full_version >= '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.13'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/46/e1/82dbef6f58f382101ee7f29bb903349e66d6386ec8a30bea629ab10668ca/qiskit-2.2.1.tar.gz", hash = "sha256:d116e55bea21c2ecd7392dee8f3ec532f5e63c8a01c54c5a7440b38320c24774", size = 3775242, upload-time = "2025-09-26T09:05:52.561Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/24/97/fc7661bdd055c02758bd05f7deac21d4ffb83389f56be1e2278fe3b12a51/qiskit-2.2.1-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:db0c80d0ea923e9d994e403e1a09dd164b6f90e4a11729ce9353a23e640f793d", size = 7809945, upload-time = "2025-09-26T09:05:39.147Z" },
+    { url = "https://files.pythonhosted.org/packages/6c/45/59e9f272b0a2c513265f848951e7f50e756f69e405adadb205b966bcd31a/qiskit-2.2.1-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:47a1eb22dc05d46f461363f1565247f6079a90add48a4d19b9fd54c3b26bfee3", size = 7329310, upload-time = "2025-09-26T09:05:44.757Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/1f/b4bf20515e989184707f291b4ec03530a0083b674b979624a08ac6ec0501/qiskit-2.2.1-cp39-abi3-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:eb80e4e5e6922d34530d6a36487c1a059b78c9596fd4302fa9acafc249d5f8b5", size = 7699739, upload-time = "2025-09-26T09:05:46.81Z" },
+    { url = "https://files.pythonhosted.org/packages/30/92/3e7dca93ca5755021536e274bc3d104124e379f1197b6feb86e69cadd899/qiskit-2.2.1-cp39-abi3-manylinux2014_ppc64le.manylinux_2_17_ppc64le.whl", hash = "sha256:62ebb02552d0ed0da11711223f7c4b5d9ddf84853b6b208e205369ac43cbd29f", size = 8255338, upload-time = "2025-09-26T19:26:16.072Z" },
+    { url = "https://files.pythonhosted.org/packages/b2/a2/734c0988edbc4e6628c20837b235d597e5c10bc11ab5a277f03243a3628a/qiskit-2.2.1-cp39-abi3-manylinux2014_s390x.manylinux_2_17_s390x.whl", hash = "sha256:a95b86d596572106acf688aad0fc7fdcbf9674032012b0746332e8e8e232e1b5", size = 7990324, upload-time = "2025-09-26T19:26:18.535Z" },
+    { url = "https://files.pythonhosted.org/packages/da/1d/36a1b8ff819b72393d2e261ba9386ed6934ae5db03d9b83c069f376a1b98/qiskit-2.2.1-cp39-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:5c99461dfd7b17dbf840363b586c7f040fa35098dbd38361af626586cd0e888e", size = 7996265, upload-time = "2025-09-26T09:05:48.605Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/05/ca684a9a68243a08c853af7552edca7e38a395496a323212438f37621de1/qiskit-2.2.1-cp39-abi3-win_amd64.whl", hash = "sha256:063ba0b1e47a1a0a1cd8a0af80376ad720dea04fa9dfa5463cb956f4ee82b052", size = 7766390, upload-time = "2025-09-26T09:05:50.462Z" },
+]
+
+[package.optional-dependencies]
+qasm3-import = [
+    { name = "qiskit-qasm3-import", marker = "python_full_version >= '3.13'" },
+]
+visualization = [
+    { name = "matplotlib", marker = "python_full_version >= '3.13'" },
+    { name = "pillow", marker = "python_full_version >= '3.13'" },
+    { name = "pydot", marker = "python_full_version >= '3.13'" },
+    { name = "pylatexenc", marker = "python_full_version >= '3.13'" },
+    { name = "seaborn", marker = "python_full_version >= '3.13'" },
+    { name = "sympy", marker = "python_full_version >= '3.13'" },
 ]
 
 [[package]]
@@ -2522,7 +2572,8 @@ version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "openqasm3", extra = ["parser"] },
-    { name = "qiskit" },
+    { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
+    { name = "qiskit", version = "2.2.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ea/e4/0229893ae295763a9273e47a7b1a8f10599ee49c2963750440d56a4b0023/qiskit_qasm3_import-0.6.0.tar.gz", hash = "sha256:6b763ee58538b33eaf5aaa8126b687f3c03f26c4d28e6a4f04f9be24a6b184ff", size = 37141, upload-time = "2025-06-10T16:34:11.287Z" }
 wheels = [
