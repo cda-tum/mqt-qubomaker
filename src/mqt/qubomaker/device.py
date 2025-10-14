@@ -44,6 +44,43 @@ class Calibration:
                         self.heavy_children[connection] = []
                     self.heavy_children[connection].append(qubit)
 
+    def __eq__(self, value: object) -> bool:
+        """Check equality between two Calibration objects.
+
+        Args:
+            value (object): The other object to compare against.
+
+        Returns:
+            bool: True if equal, False otherwise.
+        """
+        if not isinstance(value, Calibration):
+            return False
+        return (
+            self.num_qubits == value.num_qubits
+            and self.one_qubit == value.one_qubit
+            and self.two_qubit == value.two_qubit
+            and self.measurement_confidences == value.measurement_confidences
+            and self.basis_gates == value.basis_gates
+            and self.t1 == value.t1
+            and self.t2 == value.t2
+        )
+
+    def __hash__(self) -> int:
+        """Compute a hash for the Calibration object.
+
+        Returns:
+            int: The hash value.
+        """
+        return hash((
+            self.num_qubits,
+            frozenset(self.one_qubit.items()),
+            frozenset(self.two_qubit.items()),
+            frozenset(self.measurement_confidences.items()),
+            tuple(self.basis_gates),
+            frozenset(self.t1.items()),
+            frozenset(self.t2.items()),
+        ))
+
     @classmethod
     def from_dict(cls, data: dict[str, Any], basis_gates: list[str]) -> Calibration:
         """Create a Calibration object from a dictionary."""
@@ -82,7 +119,9 @@ class Calibration:
         # Sometimes, these might not be directly connected to a heavy node, so we keep traversing until we find one that is.
         # That qubit is then the start of the longest Hamiltonian path.
         potential_starts = [x for x in self.connections_dict if len(self.connections_dict[x]) == 1]
-        assert len(potential_starts) >= 2, "There should be exactly two potential starts for the connected qubit chain."
+        assert len(potential_starts) >= 2, (
+            f"There should be exactly two potential starts for the connected qubit chain. ({potential_starts})"
+        )
         start = min(potential_starts)
 
         # To check if `start` is connected to a heavy node, we check whether its successsor has more than two connections.
@@ -154,14 +193,3 @@ class Calibration:
             else:
                 heavy_chain.append(s_b)
         return heavy_chain
-
-
-TEST_500 = Calibration(
-    num_qubits=500,
-    one_qubit=dict.fromkeys(range(500), 0.99),
-    two_qubit={(i, i + 1): 0.99 for i in range(499)},
-    measurement_confidences=dict.fromkeys(range(500), 0.99),
-    basis_gates=["cz", "id", "rx", "rz", "rzz", "sx", "x"],
-    t1=dict.fromkeys(range(500), 0.0001),
-    t2=dict.fromkeys(range(500), 0.0002),
-)
