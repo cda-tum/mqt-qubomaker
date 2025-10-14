@@ -233,7 +233,8 @@ build = [
 test = [
     "pytest>=7.0",
     "pytest-console-scripts>=1.4",
-    "pytest-cov>=6.1.1",
+    "pytest-cov>=6.1.1; python_version >= '3.12'",
+    "pytest-cov>=5.0,<6.0; python_version < '3.12'",
     "pytest-sugar>=1.0.0",
     "pytest-xdist>=3.7.0",
 ]
