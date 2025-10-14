@@ -192,8 +192,6 @@ isort.required-imports = ["from __future__ import annotations"]
 "typing.Mapping".msg = "Use collections.abc.Mapping instead."
 "typing.Sequence".msg = "Use collections.abc.Sequence instead."
 "typing.Set".msg = "Use collections.abc.Set instead."
-"importlib.resources".msg = "Use mqt.qubomaker._compat.importlib.resources instead."
-"importlib_resources".msg = "Use mqt.qubomaker._compat.importlib.resources instead."
 
 [tool.ruff.lint.per-file-ignores]
 "src/mqt/qubomaker/pathfinder/cost_functions.py" = ["ANN401"]

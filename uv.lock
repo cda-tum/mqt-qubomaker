@@ -1542,7 +1542,7 @@ requires-dist = [
     { name = "sphinxext-opengraph", marker = "extra == 'docs'", specifier = ">=0.9" },
     { name = "sympy", specifier = ">=1.13.1" },
     { name = "tsplib95", marker = "python_full_version < '3.13' and extra == 'tsplib'", specifier = ">=0.7.1" },
-    { name = "typing-extensions", specifier = ">=4.9.0" },
+    { name = "typing-extensions", specifier = ">=4.15.0" },
 ]
 provides-extras = ["test", "coverage", "docs", "dev", "check", "tsplib"]
 

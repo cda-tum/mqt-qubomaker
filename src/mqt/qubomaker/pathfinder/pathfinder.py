@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import operator
 from dataclasses import dataclass
+from importlib import resources
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -16,8 +17,6 @@ from typing_extensions import override
 
 from mqt.qubomaker import qubo_generator
 from mqt.qubomaker.pathfinder import cost_functions as cf
-
-from .._compat.importlib import resources
 
 if TYPE_CHECKING:
     from mqt.qubomaker.graph import Graph
