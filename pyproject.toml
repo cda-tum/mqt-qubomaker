@@ -237,7 +237,7 @@ test = [
     "pytest-cov>=5.0,<6.0; python_version < '3.12'",
     "pytest-sugar>=1.0.0",
     "pytest-xdist>=3.7.0",
-    "coverage==7.0; python_version < '3.12'",
+    "coverage==7.2; python_version < '3.12'",
     "coverage>=7.6; python_version >= '3.12'",
 ]
 docs = [
