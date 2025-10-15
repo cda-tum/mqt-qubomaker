@@ -681,8 +681,11 @@ class QuboGenerator:
 
             def add_new_qubit(qubit: int) -> None:
                 substitution[qubit] = free_qubits.pop(0)
+                if substitution[qubit] in used_qubits:
+                    circuit.reset(substitution[qubit])
+                else:
+                    used_qubits.add(substitution[qubit])
                 circuit.h(substitution[qubit])
-                used_qubits.add(substitution[qubit])
 
             total_outgoing: set[int] = set()
             remaining = list(range(qubits))
@@ -692,12 +695,13 @@ class QuboGenerator:
                 next_qubit = -1
                 for q in remaining:
                     size = len(total_outgoing.union(outgoing[q]))
-                    if size < best_size:
+                    if size < best_size or (q in remaining and next_qubit not in remaining):
                         best_size = size
                         next_qubit = q
                 remaining.remove(next_qubit)
                 total_outgoing = total_outgoing.union(outgoing[next_qubit])
-                add_new_qubit(next_qubit)
+                if next_qubit not in substitution:
+                    add_new_qubit(next_qubit)
 
                 for other in outgoing[next_qubit]:
                     if other in covered:
