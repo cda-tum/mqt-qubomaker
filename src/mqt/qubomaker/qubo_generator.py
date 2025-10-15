@@ -86,8 +86,6 @@ class QuboGenerator:
 
     auxiliary_cache: dict[sp.Expr, sp.Expr]
 
-    smart_slack: bool = True  # TODO improve
-
     disable_caching: bool = (
         False  # If set to True, the caching of the expansion will be disabled. This is useful for debugging.
     )
@@ -375,54 +373,6 @@ class QuboGenerator:
             expression = expression.subs({highest_key[0] * highest_key[1]: y}) + self.__get_slack_penalty(
                 selected_variables[0], selected_variables[1], y
             )
-
-    def __optimal_decomposition(
-        self, terms: tuple[sp.Expr, ...], auxiliary_dict: dict[sp.Expr, sp.Expr]
-    ) -> tuple[sp.Expr, sp.Expr, sp.Expr, sp.Expr]:
-        """Computes the optimal decomposition of a product of variables into terms of order 2.
-
-        Args:
-            terms (tuple[sp.Expr, ...]): The terms of the product.
-            auxiliary_dict (dict[sp.Expr, sp.Expr]): The previously used auxiliary variables.
-
-        Returns:
-            tuple[sp.Expr, sp.Expr, sp.Expr, sp.Expr]: A tuple containing the two variables that are multiplied, the auxiliary variable used for them, and the remaining expression.
-        """
-        for x1 in terms:
-            for x2 in terms:
-                if x1 == x2:
-                    continue
-                if (x1 * x2) not in auxiliary_dict:
-                    continue
-                return x1, x2, auxiliary_dict[x1 * x2], sp.Mul(*[term for term in terms if term not in {x1, x2}])
-        if self.smart_slack:
-            x1 = terms[-2]
-            x2 = terms[-1]
-            rest = sp.Mul(*terms[:-2])
-        else:
-            x1 = terms[0]
-            x2 = terms[1]
-            rest = sp.Mul(*terms[2:])
-        y: sp.Symbol = sp.Symbol(f"y_{len(auxiliary_dict) + 1}")
-        auxiliary_dict[x1 * x2] = y
-        return x1, x2, y, rest
-
-    def __decrease_order(self, expression: sp.Expr, auxiliary_dict: dict[sp.Expr, sp.Expr]) -> sp.Expr:
-        """Decreases the order of a product of variables by adding auxiliary variables.
-
-        Args:
-            expression (sp.Expr): The expression to transform.
-            auxiliary_dict (dict[sp.Expr, sp.Expr]): A dictionary of previously used auxiliary variables.
-
-        Returns:
-            sp.Expr: The new expression with lower order.
-        """
-        (x1, x2, y, rest) = self.__optimal_decomposition(expression.args, auxiliary_dict)
-        auxiliary_penalty = x1 * x2 - 2 * y * x1 - 2 * y * x2 + 3 * y
-        rest *= y
-        if self.__get_order(rest) > 2:
-            rest = self.__decrease_order(rest, auxiliary_dict)
-        return auxiliary_penalty + rest
 
     def __get_order(self, expression: sp.Expr) -> int:
         """Computes the order of a product of variables.
