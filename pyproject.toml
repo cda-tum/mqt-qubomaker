@@ -28,8 +28,6 @@ dependencies = [
     "numpy>=1.24; python_version >= '3.11'",
     "numpy>=1.22",
     "sympy>=1.13.1",
-    "matplotlib>=3.9.0; python_version > '3.11'",
-    "matplotlib>=3.7.0; python_version <= '3.11'",
     "jsonschema>=4.20.0",
     "IPython>=8.12.1",
     "ipywidgets>=8.1.1",

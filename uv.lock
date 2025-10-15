@@ -445,8 +445,49 @@ wheels = [
 
 [[package]]
 name = "coverage"
+version = "7.2.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.11.*'",
+    "python_full_version < '3.11'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/10/44/cadfed76f14e5fd2a8754c4443af064f00237724ddf858a970116d6e80fc/coverage-7.2.0.tar.gz", hash = "sha256:9cc9c41aa5af16d845b53287051340c363dd03b7ef408e45eec3af52be77810d", size = 812120, upload-time = "2023-02-23T00:59:33.554Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/fa/d7a4445d28538a3405927fc691b717e526a585581ecae1d9475a38f0dd5c/coverage-7.2.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:90e7a4cbbb7b1916937d380beb1315b12957b8e895d7d9fb032e2038ac367525", size = 199408, upload-time = "2023-02-23T00:58:22.324Z" },
+    { url = "https://files.pythonhosted.org/packages/06/e1/2b29a804e322c759e85e7d03ddcc50fff468e0b92030c2c62a2993afca10/coverage-7.2.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:34d7211be69b215ad92298a962b2cd5a4ef4b17c7871d85e15d3d1b6dc8d8c96", size = 199688, upload-time = "2023-02-23T00:58:24.534Z" },
+    { url = "https://files.pythonhosted.org/packages/17/db/e22434c2b5ad3ce8d77073c44cae00479321c1b86b9ad4ba96b714b9b88c/coverage-7.2.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:971b49dbf713044c3e5f6451b39f65615d4d1c1d9a19948fa0f41b0245a98765", size = 228174, upload-time = "2023-02-23T00:58:25.947Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/ba/cdf4b9bb568dadf7ec272270aa49f71b2cb912407440db61e9bac17c1085/coverage-7.2.0-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:f0557289260125a6c453ad5673ba79e5b6841d9a20c9e101f758bfbedf928a77", size = 226494, upload-time = "2023-02-23T00:58:27.64Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/2c/72780f4066863df9bf17eeb9b29512e6d9b12517151281e3c68e240a7e41/coverage-7.2.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:049806ae2df69468c130f04f0fab4212c46b34ba5590296281423bb1ae379df2", size = 227365, upload-time = "2023-02-23T00:58:28.949Z" },
+    { url = "https://files.pythonhosted.org/packages/47/b6/6cb610cbe6c863759232ff44d2a586ed675f93c1aa92e27a4727495b0033/coverage-7.2.0-cp310-cp310-musllinux_1_1_aarch64.whl", hash = "sha256:875b03d92ac939fbfa8ae74a35b2c468fc4f070f613d5b1692f9980099a3a210", size = 233280, upload-time = "2023-02-23T00:58:30.318Z" },
+    { url = "https://files.pythonhosted.org/packages/ab/5c/03eee90122ce1d03ed9e42a957cf79d5fdcca041c353669120c46111e421/coverage-7.2.0-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:c160e34e388277f10c50dc2c7b5e78abe6d07357d9fe7fcb2f3c156713fd647e", size = 231525, upload-time = "2023-02-23T00:58:31.742Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/3f/1525a76966df0d1b178d7df4bd0614258445231bb5e352c5d335f6a2de22/coverage-7.2.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:32e6a730fd18b2556716039ab93278ccebbefa1af81e6aa0c8dba888cf659e6e", size = 232743, upload-time = "2023-02-23T00:58:33.468Z" },
+    { url = "https://files.pythonhosted.org/packages/62/21/f42eee5f622fdd31107ab32f90f06f39778b18e3a5568f961f3ddee32d1a/coverage-7.2.0-cp310-cp310-win32.whl", hash = "sha256:f3ff4205aff999164834792a3949f82435bc7c7655c849226d5836c3242d7451", size = 201831, upload-time = "2023-02-23T00:58:35.127Z" },
+    { url = "https://files.pythonhosted.org/packages/35/9f/860c2245ace2e1730cb05fb46722797b088b333273764ca4bd4afeceef76/coverage-7.2.0-cp310-cp310-win_amd64.whl", hash = "sha256:93db11da6e728587e943dff8ae1b739002311f035831b6ecdb15e308224a4247", size = 202745, upload-time = "2023-02-23T00:58:37.006Z" },
+    { url = "https://files.pythonhosted.org/packages/91/3b/f592b63c496121075ef5fb203c6d687967d0a06342207d3365b254d6850b/coverage-7.2.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:cd38140b56538855d3d5722c6d1b752b35237e7ea3f360047ce57f3fade82d98", size = 199568, upload-time = "2023-02-23T00:58:38.238Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/a4/43d0896b544ad0cc4d5560efa5a5f1bf6599f7d30150680b403014a5901a/coverage-7.2.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:9dbb21561b0e04acabe62d2c274f02df0d715e8769485353ddf3cf84727e31ce", size = 199798, upload-time = "2023-02-23T00:58:40.222Z" },
+    { url = "https://files.pythonhosted.org/packages/58/f0/147930d69bcbce173a9fccfa41da71f44f7e34f69ca21d5e031c74cb476e/coverage-7.2.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:171dd3aa71a49274a7e4fc26f5bc167bfae5a4421a668bc074e21a0522a0af4b", size = 231832, upload-time = "2023-02-23T00:58:41.56Z" },
+    { url = "https://files.pythonhosted.org/packages/ee/73/28e4db1afe1b21172f628e6d41b8e9cca9f79e21ab6a76200825e376c80d/coverage-7.2.0-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4655ecd813f4ba44857af3e9cffd133ab409774e9d2a7d8fdaf4fdfd2941b789", size = 229401, upload-time = "2023-02-23T00:58:42.942Z" },
+    { url = "https://files.pythonhosted.org/packages/62/fb/8d1694902f9574a040fdfee0b24aec18dcb97e870152f15865c289f88956/coverage-7.2.0-cp311-cp311-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1856a8c4aa77eb7ca0d42c996d0ca395ecafae658c1432b9da4528c429f2575c", size = 231207, upload-time = "2023-02-23T00:58:44.207Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/80/126dd4d36da62f7fecf81b4f0e263a1a80eeed2230a88627602ef486f3a8/coverage-7.2.0-cp311-cp311-musllinux_1_1_aarch64.whl", hash = "sha256:bd67df6b48db18c10790635060858e2ea4109601e84a1e9bfdd92e898dc7dc79", size = 240165, upload-time = "2023-02-23T00:58:45.567Z" },
+    { url = "https://files.pythonhosted.org/packages/c1/98/fd80d9c73dfacc15eefe1ab0847145f617bc2313d0320d00e662b628c974/coverage-7.2.0-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:2d7daf3da9c7e0ed742b3e6b4de6cc464552e787b8a6449d16517b31bbdaddf5", size = 238575, upload-time = "2023-02-23T00:58:46.858Z" },
+    { url = "https://files.pythonhosted.org/packages/f7/08/8b4e9ffc37109d3637dfc36e7326b857d63d58906f2125589a2d9ee4c708/coverage-7.2.0-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:bf9e02bc3dee792b9d145af30db8686f328e781bd212fdef499db5e9e4dd8377", size = 239626, upload-time = "2023-02-23T00:58:48.04Z" },
+    { url = "https://files.pythonhosted.org/packages/82/d4/7af06e31148814c24c642541e78cf8b4f4add177a93912a978e8282b2f91/coverage-7.2.0-cp311-cp311-win32.whl", hash = "sha256:3713a8ec18781fda408f0e853bf8c85963e2d3327c99a82a22e5c91baffcb934", size = 201819, upload-time = "2023-02-23T00:58:49.283Z" },
+    { url = "https://files.pythonhosted.org/packages/56/41/2b025985d50664bfbc3d17cc8aa09bc93f0964843bef383af39ef609b510/coverage-7.2.0-cp311-cp311-win_amd64.whl", hash = "sha256:88ae5929f0ef668b582fd7cad09b5e7277f50f912183cf969b36e82a1c26e49a", size = 202841, upload-time = "2023-02-23T00:58:50.524Z" },
+]
+
+[package.optional-dependencies]
+toml = [
+    { name = "tomli", marker = "python_full_version <= '3.11'" },
+]
+
+[[package]]
+name = "coverage"
 version = "7.10.7"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13'",
+    "python_full_version == '3.12.*'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/51/26/d22c300112504f5f9a9fd2297ce33c35f3d353e4aeb987c8419453b2a7c2/coverage-7.10.7.tar.gz", hash = "sha256:f4ab143ab113be368a3e9b795f9cd7906c5ef407d6173fe9675a902e1fffc239", size = 827704, upload-time = "2025-09-21T20:03:56.815Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e5/6c/3a3f7a46888e69d18abe3ccc6fe4cb16cccb1e6a2f99698931dafca489e6/coverage-7.10.7-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:fc04cc7a3db33664e0c2d10eb8990ff6b3536f6842c9590ae8da4c614b9ed05a", size = 217987, upload-time = "2025-09-21T20:00:57.218Z" },
@@ -540,11 +581,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/4c/a1/74c51803fc70a8a40d7346660379e144be772bab4ac7bb6e6b905152345c/coverage-7.10.7-cp314-cp314t-win_amd64.whl", hash = "sha256:e1ed71194ef6dea7ed2d5cb5f7243d4bcd334bfb63e59878519be558078f848d", size = 222905, upload-time = "2025-09-21T20:03:26.93Z" },
     { url = "https://files.pythonhosted.org/packages/12/65/f116a6d2127df30bcafbceef0302d8a64ba87488bf6f73a6d8eebf060873/coverage-7.10.7-cp314-cp314t-win_arm64.whl", hash = "sha256:7fe650342addd8524ca63d77b2362b02345e5f1a093266787d210c70a50b471a", size = 220922, upload-time = "2025-09-21T20:03:28.672Z" },
     { url = "https://files.pythonhosted.org/packages/ec/16/114df1c291c22cac3b0c127a73e0af5c12ed7bbb6558d310429a0ae24023/coverage-7.10.7-py3-none-any.whl", hash = "sha256:f7941f6f2fe6dd6807a1208737b8a0cbcf1cc6d7b07d24998ad2d63590868260", size = 209952, upload-time = "2025-09-21T20:03:53.918Z" },
-]
-
-[package.optional-dependencies]
-toml = [
-    { name = "tomli", marker = "python_full_version <= '3.11'" },
 ]
 
 [[package]]
@@ -1400,7 +1436,6 @@ dependencies = [
     { name = "ipywidgets" },
     { name = "joblib" },
     { name = "jsonschema" },
-    { name = "matplotlib" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
     { name = "numpy", version = "2.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.13'" },
     { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'" },
@@ -1418,12 +1453,14 @@ check = [
 ]
 coverage = [
     { name = "pytest" },
-    { name = "pytest-cov" },
+    { name = "pytest-cov", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "pytest-cov", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 dev = [
     { name = "furo" },
     { name = "pytest" },
-    { name = "pytest-cov" },
+    { name = "pytest-cov", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "pytest-cov", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "setuptools-scm" },
     { name = "sphinx", version = "8.1.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
     { name = "sphinx", version = "8.2.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
@@ -1458,6 +1495,8 @@ build = [
 ]
 dev = [
     { name = "breathe" },
+    { name = "coverage", version = "7.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "furo" },
     { name = "graphviz" },
     { name = "myst-nb" },
@@ -1465,7 +1504,8 @@ dev = [
     { name = "pybind11" },
     { name = "pytest" },
     { name = "pytest-console-scripts" },
-    { name = "pytest-cov" },
+    { name = "pytest-cov", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "pytest-cov", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
     { name = "qiskit", version = "1.4.4", source = { registry = "https://pypi.org/simple" }, extra = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'" },
@@ -1500,9 +1540,12 @@ docs = [
     { name = "sphinxext-opengraph" },
 ]
 test = [
+    { name = "coverage", version = "7.2.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pytest" },
     { name = "pytest-console-scripts" },
-    { name = "pytest-cov" },
+    { name = "pytest-cov", version = "5.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "pytest-cov", version = "7.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
 ]
@@ -1515,8 +1558,6 @@ requires-dist = [
     { name = "ipywidgets", specifier = ">=8.1.1" },
     { name = "joblib", specifier = ">=1.3.2" },
     { name = "jsonschema", specifier = ">=4.20.0" },
-    { name = "matplotlib", marker = "python_full_version < '3.12'", specifier = ">=3.7.0" },
-    { name = "matplotlib", marker = "python_full_version >= '3.12'", specifier = ">=3.9.0" },
     { name = "mqt-qubomaker", extras = ["coverage", "docs"], marker = "extra == 'dev'" },
     { name = "mqt-qubomaker", extras = ["test"], marker = "extra == 'coverage'" },
     { name = "networkx", marker = "extra == 'tsplib'", specifier = "==2.8.8" },
@@ -1554,6 +1595,8 @@ build = [
 ]
 dev = [
     { name = "breathe", specifier = ">=4.36.0" },
+    { name = "coverage", marker = "python_full_version < '3.12'", specifier = "==7.2" },
+    { name = "coverage", marker = "python_full_version >= '3.12'", specifier = ">=7.6" },
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "graphviz", specifier = ">=0.20.3" },
     { name = "myst-nb", specifier = ">=1.2.0" },
@@ -1561,7 +1604,8 @@ dev = [
     { name = "pybind11", specifier = ">=3.0.0" },
     { name = "pytest", specifier = ">=7.0" },
     { name = "pytest-console-scripts", specifier = ">=1.4" },
-    { name = "pytest-cov", specifier = ">=6.1.1" },
+    { name = "pytest-cov", marker = "python_full_version < '3.12'", specifier = ">=5.0,<6.0" },
+    { name = "pytest-cov", marker = "python_full_version >= '3.12'", specifier = ">=6.1.1" },
     { name = "pytest-sugar", specifier = ">=1.0.0" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
     { name = "qiskit", extras = ["qasm3-import", "visualization"], marker = "python_full_version < '3.13'", specifier = ">=1.0.0" },
@@ -1596,9 +1640,12 @@ docs = [
     { name = "sphinxext-opengraph", specifier = ">=0.10.0" },
 ]
 test = [
+    { name = "coverage", marker = "python_full_version < '3.12'", specifier = "==7.2" },
+    { name = "coverage", marker = "python_full_version >= '3.12'", specifier = ">=7.6" },
     { name = "pytest", specifier = ">=7.0" },
     { name = "pytest-console-scripts", specifier = ">=1.4" },
-    { name = "pytest-cov", specifier = ">=6.1.1" },
+    { name = "pytest-cov", marker = "python_full_version < '3.12'", specifier = ">=5.0,<6.0" },
+    { name = "pytest-cov", marker = "python_full_version >= '3.12'", specifier = ">=6.1.1" },
     { name = "pytest-sugar", specifier = ">=1.0.0" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
 ]
@@ -2263,12 +2310,33 @@ wheels = [
 
 [[package]]
 name = "pytest-cov"
+version = "5.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version == '3.11.*'",
+    "python_full_version < '3.11'",
+]
+dependencies = [
+    { name = "coverage", version = "7.2.0", source = { registry = "https://pypi.org/simple" }, extra = ["toml"], marker = "python_full_version < '3.12'" },
+    { name = "pytest", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/74/67/00efc8d11b630c56f15f4ad9c7f9223f1e5ec275aaae3fa9118c6a223ad2/pytest-cov-5.0.0.tar.gz", hash = "sha256:5837b58e9f6ebd335b0f8060eecce69b662415b16dc503883a02f45dfeb14857", size = 63042, upload-time = "2024-03-24T20:16:34.856Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/78/3a/af5b4fa5961d9a1e6237b530eb87dd04aea6eb83da09d2a4073d81b54ccf/pytest_cov-5.0.0-py3-none-any.whl", hash = "sha256:4f0764a1219df53214206bf1feea4633c3b558a2925c8b59f144f682861ce652", size = 21990, upload-time = "2024-03-24T20:16:32.444Z" },
+]
+
+[[package]]
+name = "pytest-cov"
 version = "7.0.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13'",
+    "python_full_version == '3.12.*'",
+]
 dependencies = [
-    { name = "coverage", extra = ["toml"] },
-    { name = "pluggy" },
-    { name = "pytest" },
+    { name = "coverage", version = "7.10.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pluggy", marker = "python_full_version >= '3.12'" },
+    { name = "pytest", marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/5e/f7/c933acc76f5208b3b00089573cf6a2bc26dc80a8aece8f52bb7d6b1855ca/pytest_cov-7.0.0.tar.gz", hash = "sha256:33c97eda2e049a0c5298e91f519302a1334c26ac65c1a483d6206fd458361af1", size = 54328, upload-time = "2025-09-09T10:57:02.113Z" }
 wheels = [
