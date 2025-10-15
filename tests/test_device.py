@@ -60,7 +60,6 @@ def sample_device_heavy_hex() -> Calibration:
 
     num_qubits = max(max(pair) for pair in heavy_hex_coupling) + 1
 
-    print(heavy_hex_coupling)
     cal = Calibration(
         num_qubits=num_qubits,
         one_qubit=dict.fromkeys(range(num_qubits), 0.99),
