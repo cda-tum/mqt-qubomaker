@@ -65,12 +65,12 @@ graph = qm.Graph.from_adjacency_matrix(
 )
 
 # select the settings for the QUBO formulation.
-settings = pf.PathFindingQUBOGeneratorSettings(
+settings = pf.PathFindingQuboGeneratorSettings(
     encoding_type=pf.EncodingType.ONE_HOT, n_paths=1, max_path_length=4, loops=True
 )
 
 # define the generator to be used for the QUBO formulation.
-generator = pf.PathFindingQUBOGenerator(
+generator = pf.PathFindingQuboGenerator(
     objective_function=pf.MinimizePathLength(path_ids=[1]),
     graph=graph,
     settings=settings,
