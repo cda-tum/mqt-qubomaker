@@ -75,7 +75,7 @@ check = [
 ]
 tsplib = [
     "tsplib95>=0.7.1; python_version < '3.13'",
-    "numpy>=1.22,<2.0; python_version < '3.13'",
+    "numpy>=2.3,<2.4; python_version < '3.13'",
     "pandas[output-formatting]==2.1.2; python_version < '3.13'",
     "networkx==2.8.8",
 ]
