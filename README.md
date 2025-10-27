@@ -1,3 +1,7 @@
+> [!WARNING]
+> As of October 2025, this repository is no longer actively maintained. All code has been directly integrated into [MQT ProblemSolver](https://github.com/munich-quantum-toolkit/problemsolver).
+> Development is expected to continue there. No new contributions will be accepted here.
+
 [![PyPI](https://img.shields.io/pypi/v/mqt.qubomaker?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.qubomaker/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
